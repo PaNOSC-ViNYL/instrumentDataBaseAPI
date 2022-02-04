@@ -1,0 +1,7 @@
+sphinx
+nbsphinx
+recommonmark
+sphinx_rtd_theme
+jinja2==3.0.3
+pandoc
+sphinx-autodoc-typehints

@@ -1,0 +1,66 @@
+name: build documentation with Sphinx and put it in the docs/ directory for github pages
+
+on:
+  pull_request:
+    branches:
+      - main
+      - design
+  push:
+    branches:
+      - design
+   
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      
+    env:
+      DOC_PATH: doc
+      pythonversion: 3.8
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ env.pythonversion }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ env.pythonversion }}
+
+    - name: Upgrade pip
+      run: |
+        # install pip=>20.1 to use "pip cache dir"
+        python3 -m pip install --upgrade pip
+
+    - name: Get pip cache dir
+      id: pip-cache
+      run: echo "::set-output name=dir::$(pip cache dir)"
+
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+            
+    - name: Install dependencies
+      run: |
+        sudo apt install pandoc
+        pip install -r requirements.txt
+        pip install -r doc/requirements.txt
+        pip install -e .
+
+    - name: Generate documentation
+      run: |
+        cd $DOC_PATH
+        make html
+
+    - name: GitHub Pages action
+      uses: peaceiris/actions-gh-pages@v3.7.3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{ env.DOC_PATH }}/build/html
+        publish_branch: gh-pages
+
+
