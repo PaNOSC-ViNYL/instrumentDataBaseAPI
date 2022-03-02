@@ -3,7 +3,7 @@
 """Tests for `instrumentdatabaseapi` package."""
 
 import pytest
-
+import tempfile
 from click.testing import CliRunner
 
 from instrumentdatabaseapi import instrumentdatabaseapi as API
@@ -41,21 +41,40 @@ def test_design_defaults():
     """Test for API design"""
 
     # init the local repo, making a git clone
-    API.init()
-    API.ls_instruments()  # print the list of instruments available
-    instrument_name = "ILL/D22"
-    API.ls_versions(instrument_name)
+    repo = API.repository()
+    # how to avoid the repo = API.repository syntax? without the parentheses
 
-    myinstrument = API.load_instrument("ILL/D22", "HEAD")
-    myinstrument.print_parameters()
+    print()
+    print(repo)
+    assert (
+        repo._repository__url
+        == "https://github.com/PaNOSC-ViNYL/instrument_database.git"
+    )
+    assert repo._repository__local_repo == "/tmp/instrumentDBAPI/"
+    with tempfile.TemporaryDirectory() as temp_dir:
+        print("Testing with temporary directory")
+        repo.init(None, temp_dir)
+        assert repo._repository__local_repo == temp_dir
+        repo.ls_institutes()
+        repo.ls_instruments("ILL")
+        assert type(repo.get_institutes()) is list
+        instrument = repo.load("ILL", "D22")
 
-    myinstrument["wavelength"] = pint.Unit("5", "angstrom")
 
-    mysample = ""  # sampleAPI.load_sample()
-    # sampleAPI.ls_samples()
+# api.ls_instruments()  # print the list of instruments available
+# instrument_name = "ILL/D22"
+# api.ls_versions(instrument_name)
 
-    myinstrument.set_sample()  # ?
-    # or
-    API.set_sample(myinstrument, mysample)  # ?
+# myinstrument = api.load_instrument("ILL/D22", "HEAD")
+# myinstrument.print_parameters()
 
-    mydate = myinstrument.run()
+# myinstrument["wavelength"] = pint.Unit("5", "angstrom")
+
+# mysample = ""  # sampleAPI.load_sample()
+# # sampleAPI.ls_samples()
+
+# myinstrument.set_sample()  # ?
+# # or
+# api.set_sample(myinstrument, mysample)  # ?
+
+# mydate = myinstrument.run()
