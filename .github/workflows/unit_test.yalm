@@ -1,0 +1,33 @@
+name: instrument database API unit tests on ubuntu
+on: [push]
+jobs:
+  build:
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+    runs-on: ubuntu-latest
+      
+    steps:
+      - name: Temporary developer checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.BRANCH }}
+          path: instrumentDataBaseAPI
+    
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+              
+      - name: Install dependencies
+        run: |
+          cd instrumentDataBaseAPI
+          python -m pip install --upgrade pip
+          pip install -r requirements_dev.txt
+          pip install -e .
+        
+      - name: Show file structure
+        run: tree .
+
+      - name: Run unit tests
+        run: python -m pytest instrumentDataBaseAPI/instrumentDataBaseAPI/tests/
