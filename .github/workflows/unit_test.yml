@@ -40,9 +40,13 @@ jobs:
         run: |
           ls /usr/share/mcstas/
           /usr/share/mcstas/${{ matrix.mcstas-version }}/environment
+          echo "MCSTAS: $MCSTAS"
+          echo "MCSTAS_PATH: $MCSTAS_PATH"
           
       - name: Show file structure
         run: tree .
 
       - name: Run unit tests
-        run: python -m pytest instrumentDataBaseAPI/tests/
+        run: |
+          /usr/share/mcstas/${{ matrix.mcstas-version }}/environment
+          python -m pytest instrumentDataBaseAPI/tests/
