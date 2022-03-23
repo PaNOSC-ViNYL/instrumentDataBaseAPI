@@ -19,25 +19,25 @@ jobs:
       MCSTAS: /usr/share/mcstas/${{ matrix.mcstas-version }}
 
     steps:
-      - name: Temporary developer checkout
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ env.BRANCH }}
-          path: instrumentDataBaseAPI
+    - name: Temporary developer checkout
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ env.BRANCH }}
+        path: instrumentDataBaseAPI
     
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          cd instrumentDataBaseAPI
-          python -m pip install --upgrade pip
-          pip install -r requirements_dev.txt
-          pip install -e .
+    - name: Install dependencies
+      run: |
+        cd instrumentDataBaseAPI
+        python -m pip install --upgrade pip
+        pip install -r requirements_dev.txt
+        pip install -e .
 
-      - name: Lint with flake8
+    - name: Lint with flake8
       run: |
         cd instrumentDataBaseAPI
         # stop the build if there are Python syntax errors or undefined names
@@ -45,17 +45,17 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Install McStas
-        run: |
-          cd /etc/apt/sources.list.d
-          sudo wget http://packages.mccode.org/debian/mccode.list
-          sudo apt-get update
-          sudo apt-get install mcstas-suite-python mcstas-${{ matrix.mcstas-version }}
+    - name: Install McStas
+      run: |
+        cd /etc/apt/sources.list.d
+        sudo wget http://packages.mccode.org/debian/mccode.list
+        sudo apt-get update
+        sudo apt-get install mcstas-suite-python mcstas-${{ matrix.mcstas-version }}
           
-      - name: Show file structure
-        run: tree .
+    - name: Show file structure
+      run: tree .
 
-      - name: Run unit tests
-        run: |
-          python -m pytest instrumentDataBaseAPI/tests/
+    - name: Run unit tests
+      run: |
+        python -m pytest instrumentDataBaseAPI/tests/
 
