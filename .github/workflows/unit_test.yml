@@ -34,10 +34,11 @@ jobs:
           cd /etc/apt/sources.list.d
           sudo wget http://packages.mccode.org/debian/mccode.list
           sudo apt-get update
-          sudo apt-get install mcstas-suite-python
+          sudo apt-get install mcstas-suite-python mcstas-${{ matrix.mcstas-version }}
 
       - name: Mcstas environment
         run: |
+          ls /usr/share/mcstas/
           /usr/share/mcstas/${{ matrix.mcstas-version }}/environment
           
       - name: Show file structure
