@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MCSTAS: /usr/share/mcstas/${{ matrix.mcstas-version }}
-      
+
     steps:
       - name: Temporary developer checkout
         uses: actions/checkout@v2
