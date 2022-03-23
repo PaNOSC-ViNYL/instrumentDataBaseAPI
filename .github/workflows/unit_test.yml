@@ -1,5 +1,7 @@
 name: instrument database API unit tests on ubuntu
+
 on: [push]
+
 jobs:
   build:
     strategy:
