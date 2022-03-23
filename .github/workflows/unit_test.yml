@@ -40,6 +40,7 @@ jobs:
         run: |
           ls /usr/share/mcstas/
           /usr/share/mcstas/${{ matrix.mcstas-version }}/environment
+          /usr/bin/env
           echo "MCSTAS: $MCSTAS"
           echo "MCSTAS_PATH: $MCSTAS_PATH"
           
