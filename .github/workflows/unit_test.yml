@@ -9,6 +9,8 @@ jobs:
         python-version: [3.7, 3.8, 3.9]
         mcstas-version: [2.7]
     runs-on: ubuntu-latest
+    env:
+      MCSTAS: /usr/share/mcstas/${{ matrix.mcstas-version }}
       
     steps:
       - name: Temporary developer checkout
@@ -39,7 +41,7 @@ jobs:
       - name: Mcstas environment
         run: |
           ls /usr/share/mcstas/
-          /usr/share/mcstas/${{ matrix.mcstas-version }}/environment
+
           /usr/bin/env
           echo "MCSTAS: $MCSTAS"
           echo "MCSTAS_PATH: $MCSTAS_PATH"
