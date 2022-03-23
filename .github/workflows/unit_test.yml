@@ -7,6 +7,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.7, 3.8, 3.9]
+        mcstas-version: [2.7]
     runs-on: ubuntu-latest
       
     steps:
@@ -35,9 +36,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install mcstas-suite-python
 
-      - name: Mcstas 2.7 environment
+      - name: Mcstas environment
         run: |
-          /usr/bin/mcstas-2.7-environment
+          /usr/local/bin/mcstas-${{ matrix.mcstas-version }}-environment
           
       - name: Show file structure
         run: tree .
