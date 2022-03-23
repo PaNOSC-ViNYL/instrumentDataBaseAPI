@@ -2,9 +2,11 @@ name: instrument database API unit tests on ubuntu
 
 on:
   push:
-    branches: [ design ]
+    branches:
+      - design
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
