@@ -38,7 +38,7 @@ jobs:
 
       - name: Mcstas environment
         run: |
-          /usr/local/bin/mcstas-${{ matrix.mcstas-version }}-environment
+          /usr/share/mcstas/${{ matrix.mcstas-version }}/environment
           
       - name: Show file structure
         run: tree .
