@@ -4,10 +4,12 @@
 
 import pytest
 import tempfile
-from click.testing import CliRunner
+
+# from click.testing import CliRunner
 
 from instrumentdatabaseapi import instrumentdatabaseapi as API
-from instrumentdatabaseapi import cli
+
+# from instrumentdatabaseapi import cli
 
 
 from mcstasscript.interface import functions
