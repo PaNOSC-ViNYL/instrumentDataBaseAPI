@@ -17,7 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MCSTAS: /usr/share/mcstas/${{ matrix.mcstas-version }}
-
+      local_path: instrumentDataBaseAPI
+      
     steps:
     - name: Temporary developer checkout
       uses: actions/checkout@v2
@@ -32,14 +33,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd instrumentDataBaseAPI
+        cd $local_path
         python -m pip install --upgrade pip
         pip install -r requirements_dev.txt
         pip install -e .
 
     - name: Lint with flake8
       run: |
-        cd instrumentDataBaseAPI
+        cd $local_path
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
@@ -47,7 +48,7 @@ jobs:
 
     - name: Black check
       run: |
-        black --check --diff
+        black --check --diff $local_path/instrumentdatabaseapi/
         
     - name: Install McStas
       run: |
@@ -61,5 +62,5 @@ jobs:
 
     - name: Run unit tests
       run: |
-        python -m pytest instrumentDataBaseAPI/tests/
+        python -m pytest $local_path/tests/
 
