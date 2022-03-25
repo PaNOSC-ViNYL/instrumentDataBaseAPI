@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       docdir: docs/
-      python_version: 3.8
+      pythonversion: 3.8
       
     steps:
     - name: Temporary developer checkout
@@ -23,10 +23,10 @@ jobs:
         ref: ${{ env.BRANCH }}
         path: instrumentDataBaseAPI
     
-    - name: Set up Python $python_version
+    - name: Set up Python $pythonversion
       uses: actions/setup-python@v2
       with:
-        python-version: $python_version
+        python-version: $pythonversion
 
     - name: Install dependencies
       run: |
