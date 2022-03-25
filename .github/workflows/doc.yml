@@ -40,6 +40,8 @@ jobs:
 
     - name: Generate documentation
       run: |
+        git config --local user.email "githubaction@noreply.com"
+        git config --local user.name "Github Actions"
         cd $local_path
         cd doc
         make html
