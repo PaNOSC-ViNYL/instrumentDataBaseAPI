@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>libpyvinyl.Instrument &mdash; instrumentdatabaseapi 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> instrumentdatabaseapi
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../include/notebooks/example-01.html">Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../include/refman.html">Reference Manual</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">instrumentdatabaseapi</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>libpyvinyl.Instrument</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for libpyvinyl.Instrument</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">:module Instrument: Module hosting the Instrument class</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">libpyvinyl.Parameters.Collections</span> <span class="kn">import</span> <span class="n">InstrumentParameters</span>
+
+
+<div class="viewcode-block" id="Instrument"><a class="viewcode-back" href="../../include/refman.html#libpyvinyl.Instrument.Instrument">[docs]</a><span class="k">class</span> <span class="nc">Instrument</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;An Instrument class&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">calculators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">instrument_base_dir</span><span class="o">=</span><span class="s2">&quot;./&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;An Instrument class</span>
+
+<span class="sd">        :param name: The name of this instrument</span>
+<span class="sd">        :type name: str</span>
+<span class="sd">        :param calculators: A collection of Calculator objects.</span>
+<span class="sd">        :type calculators: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__instrument_base_dir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parameters</span> <span class="o">=</span> <span class="n">InstrumentParameters</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__calculators</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">calculators</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">calculator</span> <span class="ow">in</span> <span class="n">calculators</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_calculator</span><span class="p">(</span><span class="n">calculator</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_instrument_base_dir</span><span class="p">(</span><span class="n">instrument_base_dir</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Instrument.add_master_parameter"><a class="viewcode-back" href="../../include/refman.html#libpyvinyl.Instrument.Instrument.add_master_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">add_master_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">add_master_parameter</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The name of this instrument.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+
+    <span class="nd">@name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Instrument: name is expecting a str rather than </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">calculators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The list of calculators. It&#39;s modified either when constructing the class instance</span>
+<span class="sd">        or using the `add_calculator` function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__calculators</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The parameter collection of each calculator in the instrument. These parameters are links to the</span>
+<span class="sd">        exact parameters of each calculator.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parameters</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">master</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">master</span>
+
+<div class="viewcode-block" id="Instrument.set_instrument_base_dir"><a class="viewcode-back" href="../../include/refman.html#libpyvinyl.Instrument.Instrument.set_instrument_base_dir">[docs]</a>    <span class="k">def</span> <span class="nf">set_instrument_base_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set each calculator&#39;s `instrument_base_dir` to &#39;`base`. Each calculator&#39;s data file ouput directory</span>
+<span class="sd">        will be &quot;`instrument_base_dir`/`calculator_base_dir`&quot;.</span>
+
+<span class="sd">        :param base: The base directory to be set.</span>
+<span class="sd">        :type base: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__instrument_base_dir</span> <span class="o">=</span> <span class="n">base</span>
+            <span class="k">for</span> <span class="n">calculator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculators</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">calculator</span><span class="o">.</span><span class="n">instrument_base_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instrument_base_dir</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Instrument: instrument_base_dir is expecting a str rather than </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">base</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.list_calculators"><a class="viewcode-back" href="../../include/refman.html#libpyvinyl.Instrument.Instrument.list_calculators">[docs]</a>    <span class="k">def</span> <span class="nf">list_calculators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;- Instrument: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> -</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">string</span> <span class="o">+=</span> <span class="s2">&quot;Calculators:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculators</span><span class="p">:</span>
+            <span class="n">string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.list_parameters"><a class="viewcode-back" href="../../include/refman.html#libpyvinyl.Instrument.Instrument.list_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">list_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.add_calculator"><a class="viewcode-back" href="../../include/refman.html#libpyvinyl.Instrument.Instrument.add_calculator">[docs]</a>    <span class="k">def</span> <span class="nf">add_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calculator</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__calculators</span><span class="p">[</span><span class="n">calculator</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">calculator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parameters</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">calculator</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">calculator</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Instrument.remove_calculator"><a class="viewcode-back" href="../../include/refman.html#libpyvinyl.Instrument.Instrument.remove_calculator">[docs]</a>    <span class="k">def</span> <span class="nf">remove_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calculator_name</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__calculators</span><span class="p">[</span><span class="n">calculator_name</span><span class="p">]</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parameters</span><span class="p">[</span><span class="n">calculator_name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Instrument.run"><a class="viewcode-back" href="../../include/refman.html#libpyvinyl.Instrument.Instrument.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">calculator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculators</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">calculator</span><span class="o">.</span><span class="n">backengine</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2021, Carsten Fortmann-Grote, Mads Bertelsen, Juncheng E, Shervin Nourbakhsh.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   <jinja2.runtime.BlockReference object at 0x7f85424b5f28>
+<br/>
+<br/>
+<p>
+ <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+  <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+ </a>
+    This documentation is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License.</a>
+</p>
+    <p>
+    The software
+    <i>libpyvinyl</i> is licensed under the <a href="https://github.com/PaNOSC-ViNYL/libpyvinyl/blob/master/LICENSE">LGPL version 3 or later</a>.
+</p>
+<p>
+This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No. 823852
+    <a rel="panosc" href="https://panosc.eu">
+      <img alt="Photon and Neutron Open Science Cloud" style="border-width:0" src="https://github.com/panosc-eu/panosc/blob/master/Logos%20and%20Templates/Logos/PaNOSC/PaNOSClogo_web_RGB.jpg" />
+    </a>
+</p>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
