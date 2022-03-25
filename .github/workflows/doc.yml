@@ -5,7 +5,10 @@ on:
     branches:
       - main
       - design
-      
+  push:
+    branches:
+      - design
+   
 jobs:
   build:
     runs-on: ubuntu-latest
