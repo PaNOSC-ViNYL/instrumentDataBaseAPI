@@ -12,3 +12,4 @@ sphinx_rtd_theme==0.5.1
 Click==7.0
 pytest==4.6.5
 pytest-runner==5.1
+black
