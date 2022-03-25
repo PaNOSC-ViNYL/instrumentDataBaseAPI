@@ -10,6 +10,16 @@ from instrumentdatabaseapi import instrumentdatabaseapi as API
 from instrumentdatabaseapi import cli
 
 
+from mcstasscript.interface import functions
+import os
+
+# MCSTAS_PATH = os.environ["MCSTAS"]
+# my_configurator = functions.Configurator()
+# my_configurator.set_mcrun_path("/usr/bin/")
+# my_configurator.set_mcstas_path(MCSTAS_PATH)
+# print("McStas path: ", MCSTAS_PATH)
+
+
 @pytest.fixture
 def response():
     """Sample pytest fixture.

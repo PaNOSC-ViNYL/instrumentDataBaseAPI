@@ -6,17 +6,9 @@ import git
 import importlib
 import importlib.util
 import sys
-
-from typing import Union, Optional
 import os
 
-from mcstasscript.interface import functions
-
-MCSTAS_PATH = os.environ["MCSTAS"]
-my_configurator = functions.Configurator()
-my_configurator.set_mcrun_path("/usr/bin/")
-my_configurator.set_mcstas_path(MCSTAS_PATH)
-print("McStas path: ", MCSTAS_PATH)
+from typing import Union, Optional
 
 
 class repository:
