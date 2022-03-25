@@ -15,28 +15,30 @@ jobs:
     env:
       docdir: docs/
       pythonversion: 3.8
-      
+      local_path: instrumentDataBaseAPI
+
     steps:
     - name: Temporary developer checkout
       uses: actions/checkout@v2
       with:
         ref: ${{ env.BRANCH }}
-        path: instrumentDataBaseAPI
+        path: $${ env.instrumentDataBaseAPI }}
     
     - name: Set up Python $pythonversion
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: ${{ env.pythonversion }}
 
     - name: Install dependencies
       run: |
-        cd instrumentDataBaseAPI
+        cd $local_path
         python -m pip install --upgrade pip
         pip install -r requirements_dev.txt
         pip install -e .
 
     - name: Generate documentation
       run: |
+        cd $local_path
         cd doc
         make html
         cd -
