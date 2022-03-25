@@ -1,0 +1,50 @@
+name: build documentation with Sphinx and put it in the docs/ directory for github pages
+
+on:
+  pull_request:
+    branches:
+      - main
+      - design
+      
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      docdir: docs/
+
+    steps:
+    - name: Temporary developer checkout
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ env.BRANCH }}
+        path: instrumentDataBaseAPI
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        cd instrumentDataBaseAPI
+        python -m pip install --upgrade pip
+        pip install -r requirements_dev.txt
+        pip install -e .
+
+    - name: Generate documentation
+      run: |
+        cd doc
+        make html
+        cd -
+        git rm $docdir
+        mv doc/build $docdir
+        git add $docdir
+        git commit -m "update published documentation"
+        git push
+        
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ env.BRANCH }}
+

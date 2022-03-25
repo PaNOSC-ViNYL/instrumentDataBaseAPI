@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to instrument database API's documentation!
-======================================
+===================================================
 
 .. toctree::
    :maxdepth: 2
