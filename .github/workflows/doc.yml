@@ -10,11 +10,12 @@ on:
       - design
    
 jobs:
-  build:
+  doc:
     runs-on: ubuntu-latest
     env:
       docdir: docs/
-
+      python_version: 3.8
+      
     steps:
     - name: Temporary developer checkout
       uses: actions/checkout@v2
@@ -22,10 +23,10 @@ jobs:
         ref: ${{ env.BRANCH }}
         path: instrumentDataBaseAPI
     
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python $python_version
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: $python-version
 
     - name: Install dependencies
       run: |
