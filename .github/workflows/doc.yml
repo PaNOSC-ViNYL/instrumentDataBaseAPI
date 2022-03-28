@@ -18,6 +18,8 @@ jobs:
       local_path: instrumentDataBaseAPI
 
     steps:
+    - uses: actions/checkout@v3
+
     - name: Temporary developer checkout
       uses: actions/checkout@v3
       with:
@@ -40,7 +42,6 @@ jobs:
         pip install -e .
 
     - name: Generate documentation
-      uses: actions/checkout@v3
       run: |
         cd $local_path
         git config --local user.email "githubaction@noreply.com"
