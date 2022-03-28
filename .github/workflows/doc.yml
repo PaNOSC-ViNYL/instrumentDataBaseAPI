@@ -16,17 +16,40 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
       
     env:
-      docdir: docs/html/
+      DOC_PATH: docs
       pythonversion: 3.8
-      local_path: instrumentDataBaseAPI
 
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ env.pythonversion }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ env.pythonversion }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt install pandoc
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r doc/requirements.txt
+        pip install -e .
+
+    - name: Generate documentation
+      run: |
+        cd $DOC_PATH
+        make html
+
+    - name: GitHub Pages action
+      uses: peaceiris/actions-gh-pages@v3.7.3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{ env.docdir }}
+        publish_branch: gh-pages
+
+    - name: peaceiris/actions-gh-pages@v3.7.3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{ env.docdir }}/html
+        destination_dir: docs/
         
-      - name: GitHub Pages action
-        uses: peaceiris/actions-gh-pages@v3.7.3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ${{ env.docdir }}
-          publish_branch: gh-pages
-          
