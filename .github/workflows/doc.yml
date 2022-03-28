@@ -44,13 +44,14 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3.7.3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ${{ env.docdir }}
+        publish_dir: ./doc/html
         publish_branch: gh-pages
-
+        destination_dir: docs/
+        
     - name: GitHub Pages action to docs directory
       uses: peaceiris/actions-gh-pages@v3.7.3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ${{ env.docdir }}/html
         destination_dir: docs/
-        publish_branch: ${{ github.ref }}
+        publish_branch: ${{ ENV.GITHUB_REF_NAME }}
