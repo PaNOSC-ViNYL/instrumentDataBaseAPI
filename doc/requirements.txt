@@ -1,0 +1,12 @@
+pint
+dill
+numpy
+scipy
+jsons
+h5py
+sphinx
+nbsphinx
+recommonmark
+sphinx_rtd_theme
+jinja2==3.0.3
+pandoc
