@@ -12,45 +12,21 @@ on:
 jobs:
   doc:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      
     env:
-      docdir: docs/
+      docdir: docs/html/
       pythonversion: 3.8
       local_path: instrumentDataBaseAPI
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        ref: ${{ env.BRANCH }}
-        path: ${{ env.local_path }}
-        persist-credentials: false
-    
-    - name: Set up Python ${{ env.pythonversion }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ env.pythonversion }}
-
-    - name: Install dependencies
-      run: |
-        sudo apt install pandoc
-        cd $local_path
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r doc/requirements.txt
-        pip install -e .
-
-    - name: Generate documentation
-      run: |
-        cd $local_path
-        git config --local user.email "githubaction@noreply.com"
-        git config --local user.name "Github Actions"
-        git remote set-url origin https://$GITHUB_TOKEN:x-oauth-basic@github.com/$GITHUB_REPOSITORY.git
-
-        cd doc
-        make html
-        cd -
-        git rm -r $docdir
-        mv doc/build $docdir
-        git add $docdir
-        git commit -m "update published documentation"
-        git push
-
+      - uses: actions/checkout@v3
+        
+      - name: GitHub Pages action
+        uses: peaceiris/actions-gh-pages@v3.7.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ env.docdir }}
+          publish_branch: gh-pages
+          
