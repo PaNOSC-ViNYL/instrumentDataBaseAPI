@@ -43,6 +43,9 @@ jobs:
         cd $local_path
         git config --local user.email "githubaction@noreply.com"
         git config --local user.name "Github Actions"
+        git remote set-url upstream https://$GITHUB_TOKEN:x-oauth-basic@github.com/$GITHUB_REPOSITORY.git
+        git remote set-url origin https://$GITHUB_TOKEN:x-oauth-basic@github.com/$GITHUB_REPOSITORY.git
+
         cd doc
         make html
         cd -
