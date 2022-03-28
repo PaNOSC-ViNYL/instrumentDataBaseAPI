@@ -16,7 +16,7 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
       
     env:
-      DOC_PATH: docs
+      DOC_PATH: doc
       pythonversion: 3.8
 
     steps:
