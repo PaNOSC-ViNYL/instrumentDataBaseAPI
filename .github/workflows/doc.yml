@@ -44,7 +44,7 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3.7.3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./doc/html
+        publish_dir: ./doc/build/html
         publish_branch: gh-pages
         destination_dir: docs/
         
