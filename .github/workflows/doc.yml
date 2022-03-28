@@ -54,4 +54,4 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ${{ env.docdir }}/html
         destination_dir: docs/
-        publish_branch: ${{ ENV.GITHUB_REF_NAME }}
+        publish_branch: ${{ github.ref_name }}
