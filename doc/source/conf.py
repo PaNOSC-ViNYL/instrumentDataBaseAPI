@@ -54,6 +54,7 @@ extensions = [
     "sphinx_rtd_theme",
     "nbsphinx",
     "recommonmark",
+    "sphinx_autodoc_typehints",  # in order to let it use type hints
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -210,3 +211,9 @@ todo_include_todos = True
 
 autoclass_content = "both"
 autodoc_default_flags = ["members", "show-inheritance"]
+autodoc_default_options = {
+    "member-order": "bysource",
+    #    "special-members": "__init__",
+    "undoc-members": True,
+    "exclude-members": "__weakref__",
+}
