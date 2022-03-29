@@ -15,7 +15,6 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -71,7 +70,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for instrumentdatabaseapi.instrumentdatabaseapi</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Main module.&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">This is the main API for getting instrument descriptions from the instrument database </span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">git</span> <span class="kn">import</span> <span class="n">Repo</span>
@@ -83,19 +84,49 @@
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
 
+<span class="kn">from</span> <span class="nn">libpyvinyl</span> <span class="kn">import</span> <span class="n">Instrument</span>
 
-<div class="viewcode-block" id="repository"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.repository">[docs]</a><span class="k">class</span> <span class="nc">repository</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Initiate the repository from an URL or local repo&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository">[docs]</a><span class="k">class</span> <span class="nc">Repository</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :class Repository:</span>
+<span class="sd">    The API to interact with the instrument database is offered by the Repository class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/PaNOSC-ViNYL/instrument_database.git&quot;</span><span class="p">,</span>
-        <span class="n">local_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/tmp/instrumentDBAPI/&quot;</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">local_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/dev/shm/instrumentDBAPI/&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initiate the repository from an URL or local repo</span>
+
+<span class="sd">        :param url: URL of the git repository storing the instrument database</span>
+<span class="sd">        :param local_repo: local directory where the instrument database is copied to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span> <span class="o">=</span> <span class="n">local_repo</span>
         <span class="k">return</span>
+
+<div class="viewcode-block" id="Repository.init"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/PaNOSC-ViNYL/instrument_database.git&quot;</span><span class="p">,</span>
+        <span class="n">local_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/tmp/instrumentDBAPI/&quot;</span><span class="p">,</span>
+        <span class="n">branch</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;shervin&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initiate the repository from an URL or local repo</span>
+
+<span class="sd">        :param url: URL of the git repository storing the instrument database</span>
+<span class="sd">        :param local_repo: local directory where the instrument database is copied to</span>
+<span class="sd">        :param branch: branch in the repository to checkout</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span> <span class="o">=</span> <span class="n">local_repo</span>
+
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="n">branch</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">bare</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__institutes_absdir</span><span class="p">())</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;URL: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__url</span>
@@ -116,23 +147,10 @@
     <span class="k">def</span> <span class="nf">__versions_absdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instruments_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">)</span> <span class="o">+</span> <span class="n">instrument</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
 
-<div class="viewcode-block" id="repository.init"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.repository.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">local_repo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">branch</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;shervin&quot;</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">if</span> <span class="n">url</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__url</span> <span class="o">=</span> <span class="n">url</span>
-        <span class="k">if</span> <span class="n">local_repo</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span> <span class="o">=</span> <span class="n">local_repo</span>
-
-        <span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="n">branch</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">bare</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__institutes_absdir</span><span class="p">())</span></div>
-
-<div class="viewcode-block" id="repository.get_institutes"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.repository.get_institutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_institutes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Get the list of institutes&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Repository.get_institutes"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_institutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_institutes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the list of institutes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__institutes_absdir</span><span class="p">()</span>
         <span class="n">institutes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
@@ -141,13 +159,19 @@
                 <span class="n">institutes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">institutes</span></div>
 
-<div class="viewcode-block" id="repository.ls_institutes"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.repository.ls_institutes">[docs]</a>    <span class="k">def</span> <span class="nf">ls_institutes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Print the list of institutes&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Repository.ls_institutes"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes">[docs]</a>    <span class="k">def</span> <span class="nf">ls_institutes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print the list of institutes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">institute</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_institutes</span><span class="p">():</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span> <span class="o">+</span> <span class="n">institute</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="repository.ls_instruments"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.repository.ls_instruments">[docs]</a>    <span class="k">def</span> <span class="nf">ls_instruments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Print the names of the available samples&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Repository.ls_instruments"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_instruments">[docs]</a>    <span class="k">def</span> <span class="nf">ls_instruments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print the names of the available instruments</span>
+
+<span class="sd">        :param institute: name of the institute as returned by :func:`~instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">institutes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">institute</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">institutes</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_institutes</span><span class="p">()</span>
@@ -160,12 +184,20 @@
             <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
                 <span class="n">dd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dd</span><span class="p">):</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">inst</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">inst</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span></div>
 
-        <span class="k">return</span></div>
+<div class="viewcode-block" id="Repository.ls_versions"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_versions">[docs]</a>    <span class="k">def</span> <span class="nf">ls_versions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print all implemented versions for the given instrument</span>
 
-<div class="viewcode-block" id="repository.ls_versions"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.repository.ls_versions">[docs]</a>    <span class="k">def</span> <span class="nf">ls_versions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Print all implemented versions for the given instrument&quot;&quot;&quot;</span>
+<span class="sd">        :param institute: name of the institute as returned by :func:`~instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes`</span>
+<span class="sd">        :param instrument: name of the instrument as returned by :func:`~instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_instruments`</span>
+
+<span class="sd">        Version formats:</span>
+<span class="sd">          - **HEAD** is the most recent up-to-date version of the instrument and it is still currently in use</span>
+<span class="sd">          - **YYYY/MM/DD** last day of validity of the instrument description. After that date, the instrument have been either modified (so more recent version should be available) or it not in service anymore</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__versions_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available versions for instrument &quot;</span> <span class="o">+</span> <span class="n">instrument</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
@@ -173,8 +205,24 @@
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dd</span><span class="p">):</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">instrument</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="repository.load"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.repository.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;HEAD&quot;</span><span class="p">,</span> <span class="n">flavour</span><span class="o">=</span><span class="s2">&quot;quick&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Load an intrument from the repository&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Repository.load"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">,</span>
+        <span class="n">flavour</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;quick&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Instrument</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load an intrument from the repository</span>
+
+<span class="sd">        :param institute: name of the institute</span>
+<span class="sd">        :param instrument: name of the instrument</span>
+<span class="sd">        :param version: version name</span>
+<span class="sd">        :param flavour: optional string that might identify two alternative implementations of the same instrument with the same version</span>
+
+<span class="sd">        :return: the instrument object</span>
+<span class="sd">        :raise: NotImplementedError if the instrument module does not provide a def_instrument method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span> <span class="o">+</span> <span class="s2">&quot;/mcstas/institutes/&quot;</span> <span class="o">+</span> <span class="n">institute</span><span class="p">)</span>
         <span class="n">myinstrumentmodule</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span>
@@ -187,15 +235,22 @@
             <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
             <span class="o">+</span> <span class="n">flavour</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">myinstrumentmodule</span><span class="p">,</span> <span class="s2">&quot;def_instrument&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span>
+            <span class="n">myinstrumentmodule</span><span class="o">.</span><span class="n">def_instrument</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Instrument description script does not implement a def_instrument() method&quot;</span>
+            <span class="p">)</span>
 
         <span class="n">instrument_obj</span> <span class="o">=</span> <span class="n">myinstrumentmodule</span><span class="o">.</span><span class="n">def_instrument</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">instrument_obj</span></div>
+        <span class="k">return</span> <span class="n">instrument_obj</span></div></div>
 
-<div class="viewcode-block" id="repository.dump_instrument"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.repository.dump_instrument">[docs]</a>    <span class="k">def</span> <span class="nf">dump_instrument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfile</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Save the instrument in .py format&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="repository.save_parameters"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.repository.save_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">save_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfile</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Print the parameters of the instrument in .json format&quot;&quot;&quot;</span></div></div>
+<span class="c1">#    def dump_instrument(self, outfile):</span>
+<span class="c1">#        &quot;&quot;&quot;Save the instrument in .py format&quot;&quot;&quot;</span>
+
+<span class="c1">#    def save_parameters(self, outfile):</span>
+<span class="c1">#        &quot;&quot;&quot;Print the parameters of the instrument in .json format&quot;&quot;&quot;</span>
 </pre></div>
 
            </div>
@@ -211,7 +266,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   <jinja2.runtime.BlockReference object at 0x7f4f80a0df70>
+   <jinja2.runtime.BlockReference object at 0x7f0da4739a60>
 <br/>
 <br/>
 <p>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo of the pyvinyl API &mdash; instrumentdatabaseapi 0.1.0 documentation</title>
+  <title>Demo of the instrument database API &mdash; instrumentdatabaseapi 0.1.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,7 +16,6 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -49,8 +48,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../README.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Example</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Imports">Imports</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Implement-a-Calculator-that-derives-from-BaseCalculator.">Implement a Calculator that derives from <code class="docutils literal notranslate"><span class="pre">BaseCalculator</span></code>.</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Setup-the-parameters">Setup the parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Initialize-the-API">Initialize the API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Get-informations-about-the-repository">Get informations about the repository</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Setup-the-calculator">Setup the calculator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Run-the-backengine">Run the backengine</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Look-at-the-data-and-store-as-hdf5">Look at the data and store as hdf5</a></li>
@@ -82,7 +81,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Demo of the pyvinyl API</li>
+      <li>Demo of the instrument database API</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/include/notebooks/example-01.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -362,87 +361,65 @@ div.rendered_html tbody tr:hover {
     text-align: unset;
 }
 </style>
-<section id="Demo-of-the-pyvinyl-API">
-<h1>Demo of the pyvinyl API<a class="headerlink" href="#Demo-of-the-pyvinyl-API" title="Permalink to this headline"></a></h1>
+<section id="Demo-of-the-instrument-database-API">
+<h1>Demo of the instrument database API<a class="headerlink" href="#Demo-of-the-instrument-database-API" title="Permalink to this headline"></a></h1>
 <section id="Imports">
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline"></a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%load_ext autoreload
+%autoreload 2
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">libpyvinyl</span> <span class="kn">import</span> <span class="n">BaseCalculator</span><span class="p">,</span> <span class="n">CalculatorParameters</span><span class="p">,</span> <span class="n">Parameter</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">h5py</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from instrumentdatabaseapi import instrumentdatabaseapi as API
 </pre></div>
 </div>
 </div>
 </section>
-<section id="Implement-a-Calculator-that-derives-from-BaseCalculator.">
-<h2>Implement a Calculator that derives from <code class="docutils literal notranslate"><span class="pre">BaseCalculator</span></code>.<a class="headerlink" href="#Implement-a-Calculator-that-derives-from-BaseCalculator." title="Permalink to this headline"></a></h2>
+<section id="Initialize-the-API">
+<h2>Initialize the API<a class="headerlink" href="#Initialize-the-API" title="Permalink to this headline"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RandomImageCalculator</span><span class="p">(</span><span class="n">BaseCalculator</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; class: Implements simulation of a rondom image for demonstration purposes. &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span>
-                <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Constructor of the RandomImageCalculator class. &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span> <span class="o">=</span> <span class="kc">None</span>
-
-
-    <span class="k">def</span> <span class="nf">backengine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Method to do the actual calculation.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">grid_size_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">grid_size_y</span><span class="p">))]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">saveH5</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">saveH5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">openpmd</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Save image to hdf5 file &#39;output_path&#39;. &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">fname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_filenames</span><span class="p">):</span>
-            <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5</span><span class="p">:</span>
-                <span class="n">ds</span> <span class="o">=</span> <span class="n">h5</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;/data&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-
-    <span class="k">def</span> <span class="nf">init_parameters</span><span class="p">():</span>
-        <span class="k">pass</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>repo = API.repository()
 </pre></div>
 </div>
 </div>
-<section id="Setup-the-parameters">
-<h3>Setup the parameters<a class="headerlink" href="#Setup-the-parameters" title="Permalink to this headline"></a></h3>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<section id="Get-informations-about-the-repository">
+<h3>Get informations about the repository<a class="headerlink" href="#Get-informations-about-the-repository" title="Permalink to this headline"></a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">photon_energy</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;photon_energy&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;keV&#39;</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;The photon energy in units of kilo electronvolt (keV)&quot;</span><span class="p">)</span>
-<span class="n">pulse_energy</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;pulse_energy&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;J&#39;</span><span class="p">)</span>
-<span class="n">grid_size_x</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;grid_size_x&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="n">grid_size_y</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;grid_size_y&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-<br/></pre></div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span> print(repo)
+</pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+URL: https://github.com/PaNOSC-ViNYL/instrument_database.git
+local_dir: /tmp/instrumentDBAPI/
+</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">photon_energy</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">6.0</span>
-<span class="n">pulse_energy</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">5.0e-6</span>
-<span class="n">grid_size_x</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">128</span>
-<span class="n">grid_size_y</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">256</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>photon_energy.value = 6.0
+pulse_energy.value = 5.0e-6
+grid_size_x.value = 128
+grid_size_y.value = 256
 <br/></pre></div>
 </div>
 </div>
@@ -450,7 +427,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="n">CalculatorParameters</span><span class="p">([</span><span class="n">photon_energy</span><span class="p">,</span> <span class="n">pulse_energy</span><span class="p">,</span> <span class="n">grid_size_x</span><span class="p">,</span> <span class="n">grid_size_y</span><span class="p">])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>parameters = CalculatorParameters([photon_energy, pulse_energy, grid_size_x, grid_size_y])
 </pre></div>
 </div>
 </div>
@@ -461,7 +438,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">calculator</span>  <span class="o">=</span> <span class="n">RandomImageCalculator</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;RandomImageCalculator&#39;</span><span class="p">,</span> <span class="n">output_keys</span><span class="o">=</span><span class="s1">&#39;random_image.h5&#39;</span><span class="p">,</span> <span class="n">output_data_types</span><span class="o">=</span><span class="p">[],</span> <span class="nb">input</span><span class="o">=</span><span class="p">[]</span> <span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>calculator  = RandomImageCalculator(parameters=parameters, name=&#39;RandomImageCalculator&#39;, output_keys=&#39;random_image.h5&#39;, output_data_types=[], input=[] )
 </pre></div>
 </div>
 </div>
@@ -506,7 +483,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">calculator</span><span class="o">.</span><span class="n">backengine</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>calculator.backengine()
 </pre></div>
 </div>
 </div>
@@ -526,7 +503,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">calculator</span><span class="o">.</span><span class="n">data</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>calculator.data
 </pre></div>
 </div>
 </div>
@@ -555,7 +532,7 @@ array([[0.07471297, 0.00703423, 0.92835525, ..., 0.83050226, 0.93011749,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">calculator</span><span class="o">.</span><span class="n">saveH5</span><span class="p">(</span><span class="n">calculator</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>calculator.saveH5(calculator.output_path)
 </pre></div>
 </div>
 </div>
@@ -566,7 +543,7 @@ array([[0.07471297, 0.00703423, 0.92835525, ..., 0.83050226, 0.93011749,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;my_parameters.json&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>parameters.to_json(&quot;my_parameters.json&quot;)
 </pre></div>
 </div>
 </div>
@@ -577,7 +554,7 @@ array([[0.07471297, 0.00703423, 0.92835525, ..., 0.83050226, 0.93011749,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dumpfile</span> <span class="o">=</span> <span class="n">calculator</span><span class="o">.</span><span class="n">dump</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>dumpfile = calculator.dump()
 </pre></div>
 </div>
 </div>
@@ -588,7 +565,7 @@ array([[0.07471297, 0.00703423, 0.92835525, ..., 0.83050226, 0.93011749,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_parameters</span> <span class="o">=</span> <span class="n">Parameters</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">&quot;my_parameters.json&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>new_parameters = Parameters.from_json(&quot;my_parameters.json&quot;)
 </pre></div>
 </div>
 </div>
@@ -608,7 +585,7 @@ array([[0.07471297, 0.00703423, 0.92835525, ..., 0.83050226, 0.93011749,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_parameters</span><span class="o">.</span><span class="n">photon_energy</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>new_parameters.photon_energy
 </pre></div>
 </div>
 </div>
@@ -619,7 +596,7 @@ array([[0.07471297, 0.00703423, 0.92835525, ..., 0.83050226, 0.93011749,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reloaded_calculator</span> <span class="o">=</span> <span class="n">RandomImageCalculator</span><span class="p">(</span><span class="n">dumpfile</span><span class="o">=</span><span class="n">dumpfile</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>reloaded_calculator = RandomImageCalculator(dumpfile=dumpfile)
 </pre></div>
 </div>
 </div>
@@ -630,7 +607,7 @@ array([[0.07471297, 0.00703423, 0.92835525, ..., 0.83050226, 0.93011749,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reloaded_calculator</span><span class="o">.</span><span class="n">data</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>reloaded_calculator.data
 </pre></div>
 </div>
 </div>
@@ -641,7 +618,7 @@ array([[0.07471297, 0.00703423, 0.92835525, ..., 0.83050226, 0.93011749,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reloaded_calculator</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">photon_energy</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>reloaded_calculator.parameters.photon_energy
 <br/></pre></div>
 </div>
 </div>
@@ -685,7 +662,7 @@ array([[0.07471297, 0.00703423, 0.92835525, ..., 0.83050226, 0.93011749,
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   <jinja2.runtime.BlockReference object at 0x7f4f809eb310>
+   <jinja2.runtime.BlockReference object at 0x7f0da47d0280>
 <br/>
 <br/>
 <p>
