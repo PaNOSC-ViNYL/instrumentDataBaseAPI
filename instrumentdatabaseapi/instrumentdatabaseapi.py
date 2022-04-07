@@ -10,7 +10,7 @@ import importlib.util
 import sys
 import os
 
-from typing import Union, Optional
+from typing import Union, Optional, List
 
 from libpyvinyl import Instrument
 
@@ -34,6 +34,8 @@ class Repository:
         """
         self.__url = url
         self.__local_repo = local_repo
+        sys.path.append(self.__local_repo)
+
         return
 
     def init(
@@ -50,11 +52,15 @@ class Repository:
         :param branch: branch in the repository to checkout
         """
         self.__url = url
+
+        sys.path.remove(self.__local_repo)
         self.__local_repo = local_repo
+        sys.path.append(self.__local_repo)
 
         repo = git.Repo.clone_from(self.__url, self.__local_repo, branch=branch)
         assert not repo.bare
-        sys.path.append(self.__institutes_absdir())
+        #        for simulation_program in self.__simulation_programs():
+        #            sys.path.append(self.__institutes_absdir(simulation_program))
 
     def __repr__(self):
         s = "URL: " + self.__url
@@ -62,24 +68,46 @@ class Repository:
         s += "local_dir: " + self.__local_repo
         return s
 
-    def __institutes_reldir(self) -> str:
-        return "/mcstas/institutes/"
+    def __simulation_programs(self) -> List[str]:
+        return ["mcstas", "simex"]
 
-    def __institutes_absdir(self) -> str:
-        return self.__local_repo + self.__institutes_reldir()
+    def __institutes_reldir(self, simulation_program: str) -> str:
+        return "/" + simulation_program + "/institutes/"
 
-    def __instruments_absdir(self, institute: str) -> str:
+    def __institutes_absdir(self, simulation_program: str) -> str:
+        return self.__local_repo + self.__institutes_reldir(simulation_program)
+
+    def __instruments_absdir(self, simulation_program: str, institute: str) -> str:
         """Returns the instrument path relative to the institute directory"""
-        return self.__institutes_absdir() + institute + "/instruments/"
+        return (
+            self.__institutes_absdir(simulation_program) + institute + "/instruments/"
+        )
 
-    def __versions_absdir(self, institute: str, instrument: str) -> str:
-        return self.__instruments_absdir(institute) + instrument + "/"
+    def __versions_absdir(
+        self, simulation_program: str, institute: str, instrument: str
+    ) -> str:
+        return (
+            self.__instruments_absdir(simulation_program, institute) + instrument + "/"
+        )
 
-    def get_institutes(self) -> list:
+    def ls_simulation_programs(self) -> None:
+        """
+        Print the list of simulation programs for which an instrument is implemented
+        """
+
+        for simulation_program in self.__simulation_programs():
+            print(" - ", simulation_program)
+
+    def get_institutes(self, simulation_program: str) -> list:
         """
         Get the list of institutes
+
+        :raise: ValueError if the simulation program is not among those implemented
         """
-        basedir = self.__institutes_absdir()
+        if simulation_program not in self.__simulation_programs():
+            raise ValueError(f"Simulation program not among those implemented")
+
+        basedir = self.__institutes_absdir(simulation_program)
         institutes = []
         for d in os.listdir(basedir):
             dd = os.path.join(basedir, d)
@@ -87,14 +115,16 @@ class Repository:
                 institutes.append(d)
         return institutes
 
-    def ls_institutes(self) -> None:
+    def ls_institutes(self, simulation_program: str) -> None:
         """
         Print the list of institutes
         """
-        for institute in self.get_institutes():
+        for institute in self.get_institutes(simulation_program):
             print(" - " + institute)
 
-    def ls_instruments(self, institute: Optional[str] = None) -> None:
+    def ls_instruments(
+        self, simulation_program: str, institute: Optional[str] = None
+    ) -> None:
         """
         Print the names of the available instruments
 
@@ -102,19 +132,21 @@ class Repository:
         """
         institutes = []
         if institute is None:
-            institutes += self.get_institutes()
+            institutes += self.get_institutes(simulation_program)
         else:
             institutes.append(institute)
 
         for inst in institutes:
-            basedir = self.__instruments_absdir(inst)
+            basedir = self.__instruments_absdir(simulation_program, inst)
             print("Available instruments for " + inst + ":")
             for d in os.listdir(basedir):
                 dd = os.path.join(basedir, d)
                 if os.path.isdir(dd):
                     print(" - ", inst + "/" + d)
 
-    def ls_versions(self, institute: str, instrument: str) -> None:
+    def ls_versions(
+        self, simulation_program: str, institute: str, instrument: str
+    ) -> None:
         """
         Print all implemented versions for the given instrument
 
@@ -126,7 +158,7 @@ class Repository:
           - **YYYY/MM/DD** last day of validity of the instrument description. After that date, the instrument have been either modified (so more recent version should be available) or it not in service anymore
         """
 
-        basedir = self.__versions_absdir(institute, instrument)
+        basedir = self.__versions_absdir(simulation_program, institute, instrument)
         print("Available versions for instrument " + instrument + ":")
         for d in os.listdir(basedir):
             dd = os.path.join(basedir, d)
@@ -135,14 +167,16 @@ class Repository:
 
     def load(
         self,
+        simulation_program: str,
         institute: str,
         instrument: str,
         version: str = "HEAD",
-        flavour: str = "quick",
+        flavour: str = "",
     ) -> Instrument:
         """
         Load an intrument from the repository
 
+        :param simulation_program: name of the simulation program
         :param institute: name of the institute
         :param instrument: name of the instrument
         :param version: version name
@@ -152,17 +186,29 @@ class Repository:
         :raise: NotImplementedError if the instrument module does not provide a def_instrument method
         """
 
-        sys.path.append(self.__local_repo + "/mcstas/institutes/" + institute)
-        myinstrumentmodule = importlib.import_module(
-            "instruments."
+        #      sys.path.append(
+        #          self.__local_repo + "/" + simulation_program + "/institutes/"  # + institute
+        #      )
+        print(sys.path)
+
+        modulepath = (
+            simulation_program
+            + ".institutes."
+            + institute
+            + ".instruments."
             + instrument
             + "."
             + version
             + "."
             + instrument
-            + "_"
-            + flavour
         )
+
+        if flavour != "":
+            modulepath += "_" + flavour
+
+        print(modulepath)
+        myinstrumentmodule = importlib.import_module(modulepath)
+
         if not hasattr(myinstrumentmodule, "def_instrument") or not callable(
             myinstrumentmodule.def_instrument
         ):
