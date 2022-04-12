@@ -59,6 +59,22 @@ def test_local():
     instrument = repo.load("mcstas", "ILL", "D22", "HEAD", "quick")
 
     instrument = repo.load("simex", "test", "test")
+    instrument.set_instrument_base_dir("/tmp/SPB_instrument/")
+    for calculator in instrument.calculators.values():
+        print(calculator.name)
+        print(calculator.parameters)
+    print("Calculators:")
+    print(instrument.calculators)
+    instrument.list_calculators()
+    instrument.list_parameters()
+    #    print("Backengine output:")
+    #    calculation_instrument.run()
+    #    pmi.output.get_data()
+    print("Parameters:")
+    print(instrument.parameters)
+    print("Master parameters:")
+    print(instrument.master)
+    instrument.run()
 
 
 def test_design_defaults():
@@ -97,6 +113,22 @@ def test_design_defaults():
         instrument = repo.load("mcstas", "ILL", "D22", "HEAD", "quick")
 
         instrument = repo.load("simex", "test", "test")
+        instrument.set_instrument_base_dir("/tmp/SPB_instrument/")
+        for calculator in instrument.calculators.values():
+            print(calculator.name)
+            print(calculator.parameters)
+        print("Calculators:")
+        print(instrument.calculators)
+        instrument.list_calculators()
+        instrument.list_parameters()
+        #    print("Backengine output:")
+        #    calculation_instrument.run()
+        #    pmi.output.get_data()
+        print("Parameters:")
+        print(instrument.parameters)
+        print("Master parameters:")
+        print(instrument.master)
+        instrument.run()
 
 
 # api.ls_instruments()  # print the list of instruments available

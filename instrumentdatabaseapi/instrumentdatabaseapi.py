@@ -111,7 +111,7 @@ class Repository:
         institutes = []
         for d in os.listdir(basedir):
             dd = os.path.join(basedir, d)
-            if os.path.isdir(dd):
+            if os.path.isdir(dd) and d != "__pycache__":
                 institutes.append(d)
         return institutes
 
@@ -141,7 +141,7 @@ class Repository:
             print("Available instruments for " + inst + ":")
             for d in os.listdir(basedir):
                 dd = os.path.join(basedir, d)
-                if os.path.isdir(dd):
+                if d != "__pycache__" and os.path.isdir(dd):
                     print(" - ", inst + "/" + d)
 
     def ls_versions(
@@ -189,8 +189,6 @@ class Repository:
         #      sys.path.append(
         #          self.__local_repo + "/" + simulation_program + "/institutes/"  # + institute
         #      )
-        print(sys.path)
-
         modulepath = (
             simulation_program
             + ".institutes."
@@ -206,7 +204,6 @@ class Repository:
         if flavour != "":
             modulepath += "_" + flavour
 
-        print(modulepath)
         myinstrumentmodule = importlib.import_module(modulepath)
 
         if not hasattr(myinstrumentmodule, "def_instrument") or not callable(
