@@ -49,8 +49,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Example</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Imports">Imports</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Initialize-the-API">Initialize the API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Setup-the-repository-with-defaults">Setup the repository with defaults</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Get-informations-about-the-repository">Get informations about the repository</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Setup-the-calculator">Setup the calculator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Initialize-the-repository-making-a-copy-in-local">Initialize the repository making a copy in local</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Print-list-of-available-institutes">Print list of available institutes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Run-the-backengine">Run the backengine</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Look-at-the-data-and-store-as-hdf5">Look at the data and store as hdf5</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Save-the-parameters-to-a-human-readable-json-file.">Save the parameters to a human readable json file.</a></li>
@@ -375,7 +377,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from instrumentdatabaseapi import instrumentdatabaseapi as API
@@ -385,18 +387,21 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="Initialize-the-API">
 <h2>Initialize the API<a class="headerlink" href="#Initialize-the-API" title="Permalink to this headline"></a></h2>
+<section id="Setup-the-repository-with-defaults">
+<h3>Setup the repository with defaults<a class="headerlink" href="#Setup-the-repository-with-defaults" title="Permalink to this headline"></a></h3>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>repo = API.repository()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>repo = API.Repository()
 </pre></div>
 </div>
 </div>
+</section>
 <section id="Get-informations-about-the-repository">
 <h3>Get informations about the repository<a class="headerlink" href="#Get-informations-about-the-repository" title="Permalink to this headline"></a></h3>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span> print(repo)
@@ -409,36 +414,17 @@ div.rendered_html tbody tr:hover {
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 URL: https://github.com/PaNOSC-ViNYL/instrument_database.git
-local_dir: /tmp/instrumentDBAPI/
+local_dir: /dev/shm/instrumentDBAPI/
 </pre></div></div>
 </div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>photon_energy.value = 6.0
-pulse_energy.value = 5.0e-6
-grid_size_x.value = 128
-grid_size_y.value = 256
-<br/></pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>parameters = CalculatorParameters([photon_energy, pulse_energy, grid_size_x, grid_size_y])
-</pre></div>
-</div>
-</div>
 </section>
-<section id="Setup-the-calculator">
-<h3>Setup the calculator<a class="headerlink" href="#Setup-the-calculator" title="Permalink to this headline"></a></h3>
+<section id="Initialize-the-repository-making-a-copy-in-local">
+<h3>Initialize the repository making a copy in local<a class="headerlink" href="#Initialize-the-repository-making-a-copy-in-local" title="Permalink to this headline"></a></h3>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>calculator  = RandomImageCalculator(parameters=parameters, name=&#39;RandomImageCalculator&#39;, output_keys=&#39;random_image.h5&#39;, output_data_types=[], input=[] )
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>repo.init(local_repo=&quot;./local_repo/&quot;)
 </pre></div>
 </div>
 </div>
@@ -448,32 +434,86 @@ grid_size_y.value = 256
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 <span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
-<span class="ansi-green-fg">/tmp/ipykernel_3697194/3811637111.py</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
-<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>calculator  <span class="ansi-blue-fg">=</span> RandomImageCalculator<span class="ansi-blue-fg">(</span>parameters<span class="ansi-blue-fg">=</span>parameters<span class="ansi-blue-fg">,</span> name<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#39;RandomImageCalculator&#39;</span><span class="ansi-blue-fg">,</span> output_keys<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#39;random_image.h5&#39;</span><span class="ansi-blue-fg">,</span> output_data_types<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">,</span> input<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">]</span> <span class="ansi-blue-fg">)</span>
+<span class="ansi-red-fg">GitCommandError</span>                           Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-21-4e641cef086b&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>repo<span class="ansi-blue-fg">.</span>init<span class="ansi-blue-fg">(</span>local_repo<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">&#34;./local_repo/&#34;</span><span class="ansi-blue-fg">)</span>
 
-<span class="ansi-green-fg">/tmp/ipykernel_3697194/1285912060.py</span> in <span class="ansi-cyan-fg">__init__</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">      6</span>                 ):
-<span class="ansi-green-intense-fg ansi-bold">      7</span>         <span class="ansi-blue-fg">&#34;&#34;&#34; Constructor of the RandomImageCalculator class. &#34;&#34;&#34;</span>
-<span class="ansi-green-fg">----&gt; 8</span><span class="ansi-red-fg">         </span>super<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>__init__<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">*</span>args<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">      9</span>
-<span class="ansi-green-intense-fg ansi-bold">     10</span>         self<span class="ansi-blue-fg">.</span>__data <span class="ansi-blue-fg">=</span> <span class="ansi-green-fg">None</span>
+<span class="ansi-green-fg">/tmp/instrumentDataBaseAPI/instrumentdatabaseapi/instrumentdatabaseapi.py</span> in <span class="ansi-cyan-fg">init</span><span class="ansi-blue-fg">(self, url, local_repo, branch)</span>
+<span class="ansi-green-intense-fg ansi-bold">     53</span>         self<span class="ansi-blue-fg">.</span>__local_repo <span class="ansi-blue-fg">=</span> local_repo
+<span class="ansi-green-intense-fg ansi-bold">     54</span>
+<span class="ansi-green-fg">---&gt; 55</span><span class="ansi-red-fg">         </span>repo <span class="ansi-blue-fg">=</span> git<span class="ansi-blue-fg">.</span>Repo<span class="ansi-blue-fg">.</span>clone_from<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>__url<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>__local_repo<span class="ansi-blue-fg">,</span> branch<span class="ansi-blue-fg">=</span>branch<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     56</span>         <span class="ansi-green-fg">assert</span> <span class="ansi-green-fg">not</span> repo<span class="ansi-blue-fg">.</span>bare
+<span class="ansi-green-intense-fg ansi-bold">     57</span>         sys<span class="ansi-blue-fg">.</span>path<span class="ansi-blue-fg">.</span>append<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>__institutes_absdir<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
 
-<span class="ansi-green-fg">~/Repositories/libpyvinyl/libpyvinyl/BaseCalculator.py</span> in <span class="ansi-cyan-fg">__init__</span><span class="ansi-blue-fg">(self, name, input, output_keys, output_data_types, output_filenames, instrument_base_dir, calculator_base_dir, parameters)</span>
-<span class="ansi-green-intense-fg ansi-bold">    127</span>         self<span class="ansi-blue-fg">.</span>parameters <span class="ansi-blue-fg">=</span> parameters
-<span class="ansi-green-intense-fg ansi-bold">    128</span>
-<span class="ansi-green-fg">--&gt; 129</span><span class="ansi-red-fg">         </span>self<span class="ansi-blue-fg">.</span>__check_consistency<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    130</span>         <span class="ansi-red-fg"># Create output data objects according to the output_data_classes</span>
-<span class="ansi-green-intense-fg ansi-bold">    131</span>         self<span class="ansi-blue-fg">.</span>__init_output<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">~/.local/lib/python3.6/site-packages/git/repo/base.py</span> in <span class="ansi-cyan-fg">clone_from</span><span class="ansi-blue-fg">(cls, url, to_path, progress, env, multi_options, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1109</span>         <span class="ansi-green-fg">if</span> env <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">   1110</span>             git<span class="ansi-blue-fg">.</span>update_environment<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">**</span>env<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">-&gt; 1111</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> cls<span class="ansi-blue-fg">.</span>_clone<span class="ansi-blue-fg">(</span>git<span class="ansi-blue-fg">,</span> url<span class="ansi-blue-fg">,</span> to_path<span class="ansi-blue-fg">,</span> GitCmdObjectDB<span class="ansi-blue-fg">,</span> progress<span class="ansi-blue-fg">,</span> multi_options<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1112</span>
+<span class="ansi-green-intense-fg ansi-bold">   1113</span>     def archive(self, ostream: Union[TextIO, BinaryIO], treeish: Optional[str] = None,
 
-<span class="ansi-green-fg">~/Repositories/libpyvinyl/libpyvinyl/BaseCalculator.py</span> in <span class="ansi-cyan-fg">__check_consistency</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-intense-fg ansi-bold">    134</span>         <span class="ansi-blue-fg">&#34;&#34;&#34;Check the consistency of the input parameters&#34;&#34;&#34;</span>
-<span class="ansi-green-intense-fg ansi-bold">    135</span>         <span class="ansi-green-fg">if</span> len<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>output_keys<span class="ansi-blue-fg">)</span> <span class="ansi-blue-fg">!=</span> len<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>output_data_types<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
-<span class="ansi-green-fg">--&gt; 136</span><span class="ansi-red-fg">             raise ValueError(
-</span><span class="ansi-green-intense-fg ansi-bold">    137</span>                 <span class="ansi-blue-fg">f&#34;len(output_keys) = {len(self.output_keys)} is not equal to len(output_data_types) = {len(self.output_keys)}&#34;</span>
-<span class="ansi-green-intense-fg ansi-bold">    138</span>             )
+<span class="ansi-green-fg">~/.local/lib/python3.6/site-packages/git/repo/base.py</span> in <span class="ansi-cyan-fg">_clone</span><span class="ansi-blue-fg">(cls, git, url, path, odb_default_type, progress, multi_options, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1047</span>
+<span class="ansi-green-intense-fg ansi-bold">   1048</span>             log<span class="ansi-blue-fg">.</span>debug<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;Cmd(%s)&#39;s unused stdout: %s&#34;</span><span class="ansi-blue-fg">,</span> cmdline<span class="ansi-blue-fg">,</span> stdout<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">-&gt; 1049</span><span class="ansi-red-fg">             </span>finalize_process<span class="ansi-blue-fg">(</span>proc<span class="ansi-blue-fg">,</span> stderr<span class="ansi-blue-fg">=</span>stderr<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1050</span>
+<span class="ansi-green-intense-fg ansi-bold">   1051</span>         <span class="ansi-red-fg"># our git command could have a different working dir than our actual</span>
 
-<span class="ansi-red-fg">ValueError</span>: len(output_keys) = 1 is not equal to len(output_data_types) = 1
+<span class="ansi-green-fg">~/.local/lib/python3.6/site-packages/git/util.py</span> in <span class="ansi-cyan-fg">finalize_process</span><span class="ansi-blue-fg">(proc, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    368</span>     <span class="ansi-blue-fg">&#34;&#34;&#34;Wait for the process (clone, fetch, pull or push) and handle its errors accordingly&#34;&#34;&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    369</span>     <span class="ansi-red-fg">## TODO: No close proc-streams??</span>
+<span class="ansi-green-fg">--&gt; 370</span><span class="ansi-red-fg">     </span>proc<span class="ansi-blue-fg">.</span>wait<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">**</span>kwargs<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    371</span>
+<span class="ansi-green-intense-fg ansi-bold">    372</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.6/site-packages/git/cmd.py</span> in <span class="ansi-cyan-fg">wait</span><span class="ansi-blue-fg">(self, stderr)</span>
+<span class="ansi-green-intense-fg ansi-bold">    445</span>                     errstr <span class="ansi-blue-fg">=</span> read_all_from_possibly_closed_stream<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>proc<span class="ansi-blue-fg">.</span>stderr<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    446</span>                     log<span class="ansi-blue-fg">.</span>debug<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#39;AutoInterrupt wait stderr: %r&#39;</span> <span class="ansi-blue-fg">%</span> <span class="ansi-blue-fg">(</span>errstr<span class="ansi-blue-fg">,</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 447</span><span class="ansi-red-fg">                     </span><span class="ansi-green-fg">raise</span> GitCommandError<span class="ansi-blue-fg">(</span>remove_password_if_present<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>args<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">,</span> status<span class="ansi-blue-fg">,</span> errstr<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    448</span>             <span class="ansi-red-fg"># END status handling</span>
+<span class="ansi-green-intense-fg ansi-bold">    449</span>             <span class="ansi-green-fg">return</span> status
+
+<span class="ansi-red-fg">GitCommandError</span>: Cmd(&#39;git&#39;) failed due to: exit code(128)
+  cmdline: git clone -v --branch=shervin https://github.com/PaNOSC-ViNYL/instrument_database.git ./local_repo/
+  stderr: &#39;fatal: destination path &#39;./local_repo&#39; already exists and is not an empty directory.
+&#39;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>repo = API.Repository(local_repo=&quot;/opt/panosc/instrument_database/&quot;)
+print(repo)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+URL: https://github.com/PaNOSC-ViNYL/instrument_database.git
+local_dir: /opt/panosc/instrument_database/
+</pre></div></div>
+</div>
+</section>
+<section id="Print-list-of-available-institutes">
+<h3>Print list of available institutes<a class="headerlink" href="#Print-list-of-available-institutes" title="Permalink to this headline"></a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>repo.ls_institutes()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ - ILL
 </pre></div></div>
 </div>
 </section>
@@ -662,7 +702,7 @@ array([[0.07471297, 0.00703423, 0.92835525, ..., 0.83050226, 0.93011749,
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   <jinja2.runtime.BlockReference object at 0x7ffbb2727eb0>
+   <jinja2.runtime.BlockReference object at 0x7f0d6e82c820>
 <br/>
 <br/>
 <p>
