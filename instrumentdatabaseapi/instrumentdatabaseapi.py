@@ -9,6 +9,9 @@ import importlib
 import importlib.util
 import sys
 import os
+import re
+
+import subprocess  # for using pip
 
 from typing import Union, Optional, List
 
@@ -30,10 +33,17 @@ class Repository:
         Initiate the repository from an URL or local repo
 
         :param url: URL of the git repository storing the instrument database
+                    URL can be anything git can manage
+                    git will raise an error in case URL is not accepted
         :param local_repo: local directory where the instrument database is copied to
         """
+        if not isinstance(url, str):
+            raise TypeError("URL should be a string")
+        if not isinstance(local_repo, str):
+            raise TypeError("The local repo should be a string")
+
         self.__url = url
-        self.__local_repo = local_repo
+        self.__local_repo = local_repo + "/"
         sys.path.append(self.__local_repo)
 
         return
@@ -43,7 +53,7 @@ class Repository:
         url: str = "https://github.com/PaNOSC-ViNYL/instrument_database.git",
         local_repo: str = "/tmp/instrumentDBAPI/",
         branch: str = "shervin",
-    ):
+    ) -> None:
         """
         Initiate the repository from an URL or local repo
 
@@ -58,95 +68,103 @@ class Repository:
         sys.path.append(self.__local_repo)
 
         repo = git.Repo.clone_from(self.__url, self.__local_repo, branch=branch)
-        assert not repo.bare
-        #        for simulation_program in self.__simulation_programs():
-        #            sys.path.append(self.__institutes_absdir(simulation_program))
+        ## add the --depth option
 
-    def __repr__(self):
+        assert not repo.bare
+
+    def __repr__(self) -> str:
+        """
+        Allowes to get basic information about the repository
+        """
         s = "URL: " + self.__url
         s += "\n"
         s += "local_dir: " + self.__local_repo
         return s
 
-    def __simulation_programs(self) -> List[str]:
-        return ["mcstas", "simex"]
-
-    def __institutes_reldir(self, simulation_program: str) -> str:
-        return "/" + simulation_program + "/institutes/"
-
-    def __institutes_absdir(self, simulation_program: str) -> str:
-        return self.__local_repo + self.__institutes_reldir(simulation_program)
-
-    def __instruments_absdir(self, simulation_program: str, institute: str) -> str:
-        """Returns the instrument path relative to the institute directory"""
+    def __is_real_dir(self, abs_dir: str) -> bool:
+        basename = os.path.basename(abs_dir)
         return (
-            self.__institutes_absdir(simulation_program) + institute + "/instruments/"
+            os.path.isdir(abs_dir)
+            and basename != "__pycache__"
+            and re.match("\..*", basename) == None
         )
 
-    def __versions_absdir(
-        self, simulation_program: str, institute: str, instrument: str
+    def __institutes_absdir(self) -> str:
+        return self.__local_repo + "institutes/"
+
+    def __instruments_absdir(self, institute: str) -> str:
+        """Returns the instrument path relative to the institute directory"""
+        return self.__institutes_absdir() + institute + "/instruments/"
+
+    def __versions_absdir(self, institute: str, instrument: str) -> str:
+        return self.__instruments_absdir(institute) + instrument + "/"
+
+    def __simulation_programs_absdir(
+        self, institute: str, instrument: str, version: str
+    ) -> str:
+        return self.__versions_absdir(institute, instrument) + version + "/"
+
+    def __flavours_absdir(
+        self, institute: str, instrument: str, version: str, simulation_program: str
     ) -> str:
         return (
-            self.__instruments_absdir(simulation_program, institute) + instrument + "/"
+            self.__simulation_programs_absdir(institute, instrument, version)
+            + simulation_program
+            + "/"
         )
 
-    def ls_simulation_programs(self) -> None:
-        """
-        Print the list of simulation programs for which an instrument is implemented
-        """
-
-        for simulation_program in self.__simulation_programs():
-            print(" - ", simulation_program)
-
-    def get_institutes(self, simulation_program: str) -> list:
+    def get_institutes(self) -> list:
         """
         Get the list of institutes
-
-        :raise: ValueError if the simulation program is not among those implemented
         """
-        if simulation_program not in self.__simulation_programs():
-            raise ValueError(f"Simulation program not among those implemented")
 
-        basedir = self.__institutes_absdir(simulation_program)
+        basedir = self.__institutes_absdir()
         institutes = []
         for d in os.listdir(basedir):
             dd = os.path.join(basedir, d)
-            if os.path.isdir(dd) and d != "__pycache__":
+            if self.__is_real_dir(dd):
                 institutes.append(d)
         return institutes
 
-    def ls_institutes(self, simulation_program: str) -> None:
+    def ls_institutes(self) -> None:
         """
         Print the list of institutes
         """
-        for institute in self.get_institutes(simulation_program):
+        for institute in self.get_institutes():
             print(" - " + institute)
 
-    def ls_instruments(
-        self, simulation_program: str, institute: Optional[str] = None
-    ) -> None:
+    def get_instruments(self, institute: str) -> List[str]:
+        """ """
+        basedir = self.__instruments_absdir(institute)
+        instruments = []
+        for d in os.listdir(basedir):
+            dd = os.path.join(basedir, d)
+            if self.__is_real_dir(dd):
+                instruments.append(d)
+        return instruments
+
+    def ls_instruments(self, institute: str) -> None:
         """
         Print the names of the available instruments
 
         :param institute: name of the institute as returned by :func:`~instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes`
         """
-        institutes = []
-        if institute is None:
-            institutes += self.get_institutes(simulation_program)
-        else:
-            institutes.append(institute)
+        print("Available instruments for " + institute + ":")
+        for instrument in self.get_instruments(institute):
+            print(" - ", institute + "/" + instrument)
 
-        for inst in institutes:
-            basedir = self.__instruments_absdir(simulation_program, inst)
-            print("Available instruments for " + inst + ":")
-            for d in os.listdir(basedir):
-                dd = os.path.join(basedir, d)
-                if d != "__pycache__" and os.path.isdir(dd):
-                    print(" - ", inst + "/" + d)
+    def get_versions(self, institute: str, instrument: str) -> List[str]:
+        """ """
+        basedir = self.__versions_absdir(institute, instrument)
+        versions = []
 
-    def ls_versions(
-        self, simulation_program: str, institute: str, instrument: str
-    ) -> None:
+        for d in os.listdir(basedir):
+            dd = os.path.join(basedir, d)
+            if self.__is_real_dir(dd):
+                versions.append(d)
+        return versions
+
+    def ls_versions(self, institute: str, instrument: str) -> None:
         """
         Print all implemented versions for the given instrument
 
@@ -157,21 +175,73 @@ class Repository:
           - **HEAD** is the most recent up-to-date version of the instrument and it is still currently in use
           - **YYYY/MM/DD** last day of validity of the instrument description. After that date, the instrument have been either modified (so more recent version should be available) or it not in service anymore
         """
-
-        basedir = self.__versions_absdir(simulation_program, institute, instrument)
         print("Available versions for instrument " + instrument + ":")
+        for version in self.get_versions(institute, instrument):
+            print(" - ", version)
+
+    def get_simulation_programs(self, institute: str, instrument: str, version: str):
+        simulation_programs = []
+
+        basedir = self.__simulation_programs_absdir(institute, instrument, version)
+
         for d in os.listdir(basedir):
             dd = os.path.join(basedir, d)
-            if os.path.isdir(dd):
-                print(" - ", instrument + "/" + d)
+            if self.__is_real_dir(dd):
+                simulation_programs.append(d)
+        return simulation_programs
+
+    def ls_simulation_programs(
+        self, institute: str, instrument: str, version: str
+    ) -> None:
+        """
+        Print the list of simulation programs for which an instrument is implemented
+        """
+        print(
+            f"Instrument {instrument} from institute {institute} is implemented with the following programs:"
+        )
+        for sim in self.get_simulation_programs(institute, instrument, version):
+            print(" - ", sim)
+
+    def get_flavours(
+        self, institute: str, instrument: str, version: str, simulation_program: str
+    ) -> List[str]:
+        basedir = self.__flavours_absdir(
+            institute, instrument, version, simulation_program
+        )
+        flavours = []
+        for d in os.listdir(basedir):
+            if re.match(instrument + ".*\.py", d):
+                flavours.append(
+                    d[len(instrument) : -3]
+                )  # removed the instrument string and the .py at the end
+
+        if len(flavours) == 0:
+            return [""]
+
+        return flavours
+
+    def ls_flavours(
+        self, institute: str, instrument: str, version: str, simulation_program: str
+    ) -> None:
+        """
+        A given instrument might be technically implemented in different ways.
+        Flavours are strings meant to distinguish these different implementations.
+        By default an empty string should be used for an instrument.
+        """
+
+        flavours = self.get_flavours(institute, instrument, version, simulation_program)
+        print(f"Available flavours for instrument {instrument}:")
+        for d in flavours:
+            print(" - ", d)
 
     def load(
         self,
-        simulation_program: str,
         institute: str,
         instrument: str,
         version: str = "HEAD",
+        simulation_program: str = "",
         flavour: str = "",
+        dep: bool = True,
     ) -> Instrument:
         """
         Load an intrument from the repository
@@ -186,25 +256,61 @@ class Repository:
         :raise: NotImplementedError if the instrument module does not provide a def_instrument method
         """
 
-        #      sys.path.append(
-        #          self.__local_repo + "/" + simulation_program + "/institutes/"  # + institute
-        #      )
-        modulepath = (
-            simulation_program
-            + ".institutes."
-            + institute
-            + ".instruments."
-            + instrument
-            + "."
-            + version
-            + "."
-            + instrument
+        if simulation_program == "":
+            # assume there is only one and return it
+            # raise error if more than one is found
+            simulation_programs = self.get_simulation_programs(
+                institute, instrument, version
+            )
+            if len(simulation_programs) != 1:
+                raise RuntimeError(
+                    f"No specific simulation program has been required, but {len(simulation_programs)} found"
+                )
+            simulation_program = simulation_programs[0]
+
+        if flavour == "":
+            # double check that an instrument without any flavour exists
+            if not os.path.isfile(
+                self.__flavours_absdir(
+                    institute, instrument, version, simulation_program
+                )
+                + instrument
+                + ".py"
+            ):
+                # need to retrieve one flavour
+                flavours
+
+        modulepath = os.path.relpath(
+            self.__flavours_absdir(institute, instrument, version, simulation_program),
+            self.__local_repo,
+        ).replace("/", ".")
+        print(modulepath)
+        print(
+            self.__flavours_absdir(institute, instrument, version, simulation_program)
         )
 
+        mymodule = modulepath + "." + instrument
         if flavour != "":
-            modulepath += "_" + flavour
+            mymodule += "_" + flavour
+        print(mymodule)
+        if dep:
+            subprocess.check_call(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--target",
+                    self.__local_repo + "python_dependencies/",
+                    "-r",
+                    self.__flavours_absdir(
+                        institute, instrument, version, simulation_program
+                    )
+                    + "/requirements.txt",
+                ]
+            )
 
-        myinstrumentmodule = importlib.import_module(modulepath)
+        myinstrumentmodule = importlib.import_module(mymodule)
 
         if not hasattr(myinstrumentmodule, "def_instrument") or not callable(
             myinstrumentmodule.def_instrument

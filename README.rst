@@ -27,7 +27,8 @@ The instrument database is then copied locally in a temporary directory. It is h
 This API is meant as a **READ ONLY** access to the instrument database. Modifications to the instrument description can either be performed to the instruments after loading a specific instrument or to the python description script by advanced users.
 
 
-
+This API is not part of the instrument database repository, because users can use it to access any kind of instrument database structured according to the convension.
+Write here the convension.
 
 * Free software: MIT license
 * Documentation: https://panosc-vinyl.github.io/instrumentDataBaseAPI/
