@@ -81,6 +81,9 @@
 <span class="kn">import</span> <span class="nn">importlib.util</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">subprocess</span>  <span class="c1"># for using pip</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
 
@@ -102,10 +105,17 @@
 <span class="sd">        Initiate the repository from an URL or local repo</span>
 
 <span class="sd">        :param url: URL of the git repository storing the instrument database</span>
+<span class="sd">                    URL can be anything git can manage</span>
+<span class="sd">                    git will raise an error in case URL is not accepted</span>
 <span class="sd">        :param local_repo: local directory where the instrument database is copied to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;URL should be a string&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">local_repo</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The local repo should be a string&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__url</span> <span class="o">=</span> <span class="n">url</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span> <span class="o">=</span> <span class="n">local_repo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span> <span class="o">=</span> <span class="n">local_repo</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span><span class="p">)</span>
 
         <span class="k">return</span>
@@ -115,7 +125,7 @@
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/PaNOSC-ViNYL/instrument_database.git&quot;</span><span class="p">,</span>
         <span class="n">local_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/tmp/instrumentDBAPI/&quot;</span><span class="p">,</span>
         <span class="n">branch</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;shervin&quot;</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initiate the repository from an URL or local repo</span>
 
@@ -130,95 +140,103 @@
         <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span><span class="p">)</span>
 
         <span class="n">repo</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span><span class="p">,</span> <span class="n">branch</span><span class="o">=</span><span class="n">branch</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">bare</span></div>
-        <span class="c1">#        for simulation_program in self.__simulation_programs():</span>
-        <span class="c1">#            sys.path.append(self.__institutes_absdir(simulation_program))</span>
+        <span class="c1">## add the --depth option</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">bare</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allowes to get basic information about the repository</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;URL: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__url</span>
         <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;local_dir: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span>
         <span class="k">return</span> <span class="n">s</span>
 
-    <span class="k">def</span> <span class="nf">__simulation_programs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;mcstas&quot;</span><span class="p">,</span> <span class="s2">&quot;simex&quot;</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">__institutes_reldir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">simulation_program</span> <span class="o">+</span> <span class="s2">&quot;/institutes/&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__institutes_absdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__institutes_reldir</span><span class="p">(</span><span class="n">simulation_program</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__instruments_absdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the instrument path relative to the institute directory&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__is_real_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abs_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">abs_dir</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__institutes_absdir</span><span class="p">(</span><span class="n">simulation_program</span><span class="p">)</span> <span class="o">+</span> <span class="n">institute</span> <span class="o">+</span> <span class="s2">&quot;/instruments/&quot;</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">abs_dir</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">basename</span> <span class="o">!=</span> <span class="s2">&quot;__pycache__&quot;</span>
+            <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;\..*&quot;</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span> <span class="o">==</span> <span class="kc">None</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__versions_absdir</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="k">def</span> <span class="nf">__institutes_absdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span> <span class="o">+</span> <span class="s2">&quot;institutes/&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__instruments_absdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the instrument path relative to the institute directory&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__institutes_absdir</span><span class="p">()</span> <span class="o">+</span> <span class="n">institute</span> <span class="o">+</span> <span class="s2">&quot;/instruments/&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__versions_absdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instruments_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">)</span> <span class="o">+</span> <span class="n">instrument</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__simulation_programs_absdir</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__versions_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">)</span> <span class="o">+</span> <span class="n">version</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__flavours_absdir</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__instruments_absdir</span><span class="p">(</span><span class="n">simulation_program</span><span class="p">,</span> <span class="n">institute</span><span class="p">)</span> <span class="o">+</span> <span class="n">instrument</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__simulation_programs_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">simulation_program</span>
+            <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="Repository.ls_simulation_programs"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_simulation_programs">[docs]</a>    <span class="k">def</span> <span class="nf">ls_simulation_programs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Print the list of simulation programs for which an instrument is implemented</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">for</span> <span class="n">simulation_program</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__simulation_programs</span><span class="p">():</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Repository.get_institutes"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_institutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_institutes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<div class="viewcode-block" id="Repository.get_institutes"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_institutes">[docs]</a>    <span class="k">def</span> <span class="nf">get_institutes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the list of institutes</span>
-
-<span class="sd">        :raise: ValueError if the simulation program is not among those implemented</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">simulation_program</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__simulation_programs</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation program not among those implemented&quot;</span><span class="p">)</span>
 
-        <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__institutes_absdir</span><span class="p">(</span><span class="n">simulation_program</span><span class="p">)</span>
+        <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__institutes_absdir</span><span class="p">()</span>
         <span class="n">institutes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
             <span class="n">dd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span> <span class="ow">and</span> <span class="n">d</span> <span class="o">!=</span> <span class="s2">&quot;__pycache__&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_real_dir</span><span class="p">(</span><span class="n">dd</span><span class="p">):</span>
                 <span class="n">institutes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">institutes</span></div>
 
-<div class="viewcode-block" id="Repository.ls_institutes"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes">[docs]</a>    <span class="k">def</span> <span class="nf">ls_institutes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Repository.ls_institutes"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes">[docs]</a>    <span class="k">def</span> <span class="nf">ls_institutes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Print the list of institutes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">institute</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_institutes</span><span class="p">(</span><span class="n">simulation_program</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">institute</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_institutes</span><span class="p">():</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span> <span class="o">+</span> <span class="n">institute</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Repository.ls_instruments"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_instruments">[docs]</a>    <span class="k">def</span> <span class="nf">ls_instruments</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Repository.get_instruments"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_instruments">[docs]</a>    <span class="k">def</span> <span class="nf">get_instruments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instruments_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">)</span>
+        <span class="n">instruments</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
+            <span class="n">dd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_real_dir</span><span class="p">(</span><span class="n">dd</span><span class="p">):</span>
+                <span class="n">instruments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instruments</span></div>
+
+<div class="viewcode-block" id="Repository.ls_instruments"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_instruments">[docs]</a>    <span class="k">def</span> <span class="nf">ls_instruments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Print the names of the available instruments</span>
 
 <span class="sd">        :param institute: name of the institute as returned by :func:`~instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">institutes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">institute</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">institutes</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_institutes</span><span class="p">(</span><span class="n">simulation_program</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">institutes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">institute</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available instruments for &quot;</span> <span class="o">+</span> <span class="n">institute</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">instrument</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_instruments</span><span class="p">(</span><span class="n">institute</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">institute</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">instrument</span><span class="p">)</span></div>
 
-        <span class="k">for</span> <span class="n">inst</span> <span class="ow">in</span> <span class="n">institutes</span><span class="p">:</span>
-            <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instruments_absdir</span><span class="p">(</span><span class="n">simulation_program</span><span class="p">,</span> <span class="n">inst</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available instruments for &quot;</span> <span class="o">+</span> <span class="n">inst</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
-                <span class="n">dd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="s2">&quot;__pycache__&quot;</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dd</span><span class="p">):</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">inst</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Repository.get_versions"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_versions">[docs]</a>    <span class="k">def</span> <span class="nf">get_versions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__versions_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">)</span>
+        <span class="n">versions</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="Repository.ls_versions"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_versions">[docs]</a>    <span class="k">def</span> <span class="nf">ls_versions</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
+            <span class="n">dd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_real_dir</span><span class="p">(</span><span class="n">dd</span><span class="p">):</span>
+                <span class="n">versions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">versions</span></div>
+
+<div class="viewcode-block" id="Repository.ls_versions"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_versions">[docs]</a>    <span class="k">def</span> <span class="nf">ls_versions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Print all implemented versions for the given instrument</span>
 
@@ -229,21 +247,73 @@
 <span class="sd">          - **HEAD** is the most recent up-to-date version of the instrument and it is still currently in use</span>
 <span class="sd">          - **YYYY/MM/DD** last day of validity of the instrument description. After that date, the instrument have been either modified (so more recent version should be available) or it not in service anymore</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__versions_absdir</span><span class="p">(</span><span class="n">simulation_program</span><span class="p">,</span> <span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available versions for instrument &quot;</span> <span class="o">+</span> <span class="n">instrument</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_versions</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.get_simulation_programs"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_simulation_programs">[docs]</a>    <span class="k">def</span> <span class="nf">get_simulation_programs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">simulation_programs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__simulation_programs_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
             <span class="n">dd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dd</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">instrument</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_real_dir</span><span class="p">(</span><span class="n">dd</span><span class="p">):</span>
+                <span class="n">simulation_programs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">simulation_programs</span></div>
+
+<div class="viewcode-block" id="Repository.ls_simulation_programs"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_simulation_programs">[docs]</a>    <span class="k">def</span> <span class="nf">ls_simulation_programs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print the list of simulation programs for which an instrument is implemented</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Instrument </span><span class="si">{</span><span class="n">instrument</span><span class="si">}</span><span class="s2"> from institute </span><span class="si">{</span><span class="n">institute</span><span class="si">}</span><span class="s2"> is implemented with the following programs:&quot;</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">sim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_simulation_programs</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">sim</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.get_flavours"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_flavours">[docs]</a>    <span class="k">def</span> <span class="nf">get_flavours</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flavours_absdir</span><span class="p">(</span>
+            <span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">simulation_program</span>
+        <span class="p">)</span>
+        <span class="n">flavours</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">instrument</span> <span class="o">+</span> <span class="s2">&quot;.*\.py&quot;</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+                <span class="n">flavours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">d</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">instrument</span><span class="p">)</span> <span class="p">:</span> <span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+                <span class="p">)</span>  <span class="c1"># removed the instrument string and the .py at the end</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">flavours</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">flavours</span></div>
+
+<div class="viewcode-block" id="Repository.ls_flavours"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_flavours">[docs]</a>    <span class="k">def</span> <span class="nf">ls_flavours</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A given instrument might be technically implemented in different ways.</span>
+<span class="sd">        Flavours are strings meant to distinguish these different implementations.</span>
+<span class="sd">        By default an empty string should be used for an instrument.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">flavours</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_flavours</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available flavours for instrument </span><span class="si">{</span><span class="n">instrument</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">flavours</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Repository.load"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">,</span>
+        <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">flavour</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">dep</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Instrument</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load an intrument from the repository</span>
@@ -258,25 +328,61 @@
 <span class="sd">        :raise: NotImplementedError if the instrument module does not provide a def_instrument method</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1">#      sys.path.append(</span>
-        <span class="c1">#          self.__local_repo + &quot;/&quot; + simulation_program + &quot;/institutes/&quot;  # + institute</span>
-        <span class="c1">#      )</span>
-        <span class="n">modulepath</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">simulation_program</span>
-            <span class="o">+</span> <span class="s2">&quot;.institutes.&quot;</span>
-            <span class="o">+</span> <span class="n">institute</span>
-            <span class="o">+</span> <span class="s2">&quot;.instruments.&quot;</span>
-            <span class="o">+</span> <span class="n">instrument</span>
-            <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
-            <span class="o">+</span> <span class="n">version</span>
-            <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
-            <span class="o">+</span> <span class="n">instrument</span>
+        <span class="k">if</span> <span class="n">simulation_program</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="c1"># assume there is only one and return it</span>
+            <span class="c1"># raise error if more than one is found</span>
+            <span class="n">simulation_programs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_simulation_programs</span><span class="p">(</span>
+                <span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation_programs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;No specific simulation program has been required, but </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">simulation_programs</span><span class="p">)</span><span class="si">}</span><span class="s2"> found&quot;</span>
+                <span class="p">)</span>
+            <span class="n">simulation_program</span> <span class="o">=</span> <span class="n">simulation_programs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">flavour</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="c1"># double check that an instrument without any flavour exists</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__flavours_absdir</span><span class="p">(</span>
+                    <span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">simulation_program</span>
+                <span class="p">)</span>
+                <span class="o">+</span> <span class="n">instrument</span>
+                <span class="o">+</span> <span class="s2">&quot;.py&quot;</span>
+            <span class="p">):</span>
+                <span class="c1"># need to retrieve one flavour</span>
+                <span class="n">flavours</span>
+
+        <span class="n">modulepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__flavours_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">modulepath</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__flavours_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">)</span>
         <span class="p">)</span>
 
+        <span class="n">mymodule</span> <span class="o">=</span> <span class="n">modulepath</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">instrument</span>
         <span class="k">if</span> <span class="n">flavour</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="n">modulepath</span> <span class="o">+=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">flavour</span>
+            <span class="n">mymodule</span> <span class="o">+=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">flavour</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">mymodule</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dep</span><span class="p">:</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
+                    <span class="s2">&quot;-m&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;pip&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;install&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;--target&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span> <span class="o">+</span> <span class="s2">&quot;python_dependencies/&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__flavours_absdir</span><span class="p">(</span>
+                        <span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">simulation_program</span>
+                    <span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot;/requirements.txt&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
 
-        <span class="n">myinstrumentmodule</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">modulepath</span><span class="p">)</span>
+        <span class="n">myinstrumentmodule</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">mymodule</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">myinstrumentmodule</span><span class="p">,</span> <span class="s2">&quot;def_instrument&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span>
             <span class="n">myinstrumentmodule</span><span class="o">.</span><span class="n">def_instrument</span>
@@ -309,7 +415,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   <jinja2.runtime.BlockReference object at 0x7f0d6e720190>
+   <jinja2.runtime.BlockReference object at 0x7f63d25f9ac0>
 <br/>
 <br/>
 <p>

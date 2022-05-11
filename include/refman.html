@@ -111,7 +111,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – URL of the git repository storing the instrument database</p></li>
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – URL of the git repository storing the instrument database
+URL can be anything git can manage
+git will raise an error in case URL is not accepted</p></li>
 <li><p><strong>local_repo</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – local directory where the instrument database is copied to</p></li>
 </ul>
 </dd>
@@ -128,37 +130,26 @@
 <li><p><strong>branch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – branch in the repository to checkout</p></li>
 </ul>
 </dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_simulation_programs">
-<span class="sig-name descname"><span class="pre">ls_simulation_programs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.ls_simulation_programs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_simulation_programs" title="Permalink to this definition"></a></dt>
-<dd><p>Print the list of simulation programs for which an instrument is implemented</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_institutes">
-<span class="sig-name descname"><span class="pre">get_institutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_program</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.get_institutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_institutes" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_institutes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.get_institutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_institutes" title="Permalink to this definition"></a></dt>
 <dd><p>Get the list of institutes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raise</dt>
-<dd class="field-odd"><p>ValueError if the simulation program is not among those implemented</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes">
-<span class="sig-name descname"><span class="pre">ls_institutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_program</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.ls_institutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ls_institutes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.ls_institutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes" title="Permalink to this definition"></a></dt>
 <dd><p>Print the list of institutes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -168,12 +159,22 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_instruments">
+<span class="sig-name descname"><span class="pre">get_instruments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">institute</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.get_instruments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_instruments" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_instruments">
-<span class="sig-name descname"><span class="pre">ls_instruments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_program</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">institute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.ls_instruments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_instruments" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ls_instruments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">institute</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.ls_instruments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_instruments" title="Permalink to this definition"></a></dt>
 <dd><p>Print the names of the available instruments</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>institute</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – name of the institute as returned by <a class="reference internal" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes" title="instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes"><code class="xref py py-func docutils literal notranslate"><span class="pre">ls_institutes()</span></code></a></p>
+<dd class="field-odd"><p><strong>institute</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of the institute as returned by <a class="reference internal" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes" title="instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_institutes"><code class="xref py py-func docutils literal notranslate"><span class="pre">ls_institutes()</span></code></a></p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
@@ -182,8 +183,18 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_versions">
+<span class="sig-name descname"><span class="pre">get_versions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">institute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.get_versions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_versions" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_versions">
-<span class="sig-name descname"><span class="pre">ls_versions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_program</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">institute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.ls_versions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_versions" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ls_versions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">institute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.ls_versions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_versions" title="Permalink to this definition"></a></dt>
 <dd><p>Print all implemented versions for the given instrument</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -208,8 +219,47 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_simulation_programs">
+<span class="sig-name descname"><span class="pre">get_simulation_programs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">institute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.get_simulation_programs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_simulation_programs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_simulation_programs">
+<span class="sig-name descname"><span class="pre">ls_simulation_programs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">institute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.ls_simulation_programs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_simulation_programs" title="Permalink to this definition"></a></dt>
+<dd><p>Print the list of simulation programs for which an instrument is implemented</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_flavours">
+<span class="sig-name descname"><span class="pre">get_flavours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">institute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_program</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.get_flavours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.get_flavours" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_flavours">
+<span class="sig-name descname"><span class="pre">ls_flavours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">institute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_program</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.ls_flavours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.ls_flavours" title="Permalink to this definition"></a></dt>
+<dd><p>A given instrument might be technically implemented in different ways.
+Flavours are strings meant to distinguish these different implementations.
+By default an empty string should be used for an instrument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="instrumentdatabaseapi.instrumentdatabaseapi.Repository.load">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation_program</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">institute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'HEAD'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flavour</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.load" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">institute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'HEAD'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulation_program</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flavour</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/instrumentdatabaseapi/instrumentdatabaseapi.html#Repository.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#instrumentdatabaseapi.instrumentdatabaseapi.Repository.load" title="Permalink to this definition"></a></dt>
 <dd><p>Load an intrument from the repository</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -253,7 +303,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   <jinja2.runtime.BlockReference object at 0x7f0d6e6bb730>
+   <jinja2.runtime.BlockReference object at 0x7f63d2601190>
 <br/>
 <br/>
 <p>
