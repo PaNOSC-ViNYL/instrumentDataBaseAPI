@@ -234,6 +234,53 @@ class Repository:
         for d in flavours:
             print(" - ", d)
 
+    def validation_dir(
+        self,
+        institute: str,
+        instrument: str,
+        version: str = "HEAD",
+        simulation_program: str = "",
+        flavour: str = "",
+    ) -> str:
+        """
+        Return the path where the test simulation results are stored.
+        The simulation results are performed to validate the instrument.
+
+        :param simulation_program: name of the simulation program
+        :param institute: name of the institute
+        :param instrument: name of the instrument
+        :param version: version name
+        :param flavour: optional string that might identify two alternative implementations of the same instrument with the same version
+
+        """
+        if simulation_program == "":
+            # assume there is only one and return it
+            # raise error if more than one is found
+            simulation_programs = self.get_simulation_programs(
+                institute, instrument, version
+            )
+            if len(simulation_programs) != 1:
+                raise RuntimeError(
+                    f"No specific simulation program has been required, but {len(simulation_programs)} found"
+                )
+            simulation_program = simulation_programs[0]
+
+        if flavour == "":
+            # double check that an instrument without any flavour exists
+            if not os.path.isfile(
+                self.__flavours_absdir(
+                    institute, instrument, version, simulation_program
+                )
+                + instrument
+                + ".py"
+            ):
+                # need to retrieve one flavour
+                flavours
+
+        return (
+            self.__flavours_absdir(institute, instrument, version, simulation_program)
+        ) + "/validation"
+
     def load(
         self,
         institute: str,
@@ -251,6 +298,7 @@ class Repository:
         :param instrument: name of the instrument
         :param version: version name
         :param flavour: optional string that might identify two alternative implementations of the same instrument with the same version
+        :param dep: download python dependencies in requirements.txt for the instrument if dep == True
 
         :return: the instrument object
         :raise: NotImplementedError if the instrument module does not provide a def_instrument method
@@ -284,15 +332,14 @@ class Repository:
             self.__flavours_absdir(institute, instrument, version, simulation_program),
             self.__local_repo,
         ).replace("/", ".")
-        print(modulepath)
-        print(
-            self.__flavours_absdir(institute, instrument, version, simulation_program)
-        )
+        #        print(
+        #            self.__flavours_absdir(institute, instrument, version, simulation_program)
+        #        )
 
         mymodule = modulepath + "." + instrument
         if flavour != "":
             mymodule += "_" + flavour
-        print(mymodule)
+
         if dep:
             subprocess.check_call(
                 [
