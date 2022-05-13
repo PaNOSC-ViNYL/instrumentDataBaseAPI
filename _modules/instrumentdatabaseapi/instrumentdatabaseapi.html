@@ -306,6 +306,53 @@
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">flavours</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Repository.validation_dir"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.validation_dir">[docs]</a>    <span class="k">def</span> <span class="nf">validation_dir</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">,</span>
+        <span class="n">simulation_program</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">flavour</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the path where the test simulation results are stored.</span>
+<span class="sd">        The simulation results are performed to validate the instrument.</span>
+
+<span class="sd">        :param simulation_program: name of the simulation program</span>
+<span class="sd">        :param institute: name of the institute</span>
+<span class="sd">        :param instrument: name of the instrument</span>
+<span class="sd">        :param version: version name</span>
+<span class="sd">        :param flavour: optional string that might identify two alternative implementations of the same instrument with the same version</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">simulation_program</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="c1"># assume there is only one and return it</span>
+            <span class="c1"># raise error if more than one is found</span>
+            <span class="n">simulation_programs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_simulation_programs</span><span class="p">(</span>
+                <span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation_programs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;No specific simulation program has been required, but </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">simulation_programs</span><span class="p">)</span><span class="si">}</span><span class="s2"> found&quot;</span>
+                <span class="p">)</span>
+            <span class="n">simulation_program</span> <span class="o">=</span> <span class="n">simulation_programs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">flavour</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="c1"># double check that an instrument without any flavour exists</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__flavours_absdir</span><span class="p">(</span>
+                    <span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">simulation_program</span>
+                <span class="p">)</span>
+                <span class="o">+</span> <span class="n">instrument</span>
+                <span class="o">+</span> <span class="s2">&quot;.py&quot;</span>
+            <span class="p">):</span>
+                <span class="c1"># need to retrieve one flavour</span>
+                <span class="n">flavours</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__flavours_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">)</span>
+        <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/validation&quot;</span></div>
+
 <div class="viewcode-block" id="Repository.load"><a class="viewcode-back" href="../../include/refman.html#instrumentdatabaseapi.instrumentdatabaseapi.Repository.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">institute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -323,6 +370,7 @@
 <span class="sd">        :param instrument: name of the instrument</span>
 <span class="sd">        :param version: version name</span>
 <span class="sd">        :param flavour: optional string that might identify two alternative implementations of the same instrument with the same version</span>
+<span class="sd">        :param dep: download python dependencies in requirements.txt for the instrument if dep == True</span>
 
 <span class="sd">        :return: the instrument object</span>
 <span class="sd">        :raise: NotImplementedError if the instrument module does not provide a def_instrument method</span>
@@ -356,15 +404,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__flavours_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__local_repo</span><span class="p">,</span>
         <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">modulepath</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__flavours_absdir</span><span class="p">(</span><span class="n">institute</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">simulation_program</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="c1">#        print(</span>
+        <span class="c1">#            self.__flavours_absdir(institute, instrument, version, simulation_program)</span>
+        <span class="c1">#        )</span>
 
         <span class="n">mymodule</span> <span class="o">=</span> <span class="n">modulepath</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">instrument</span>
         <span class="k">if</span> <span class="n">flavour</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="n">mymodule</span> <span class="o">+=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">flavour</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">mymodule</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">dep</span><span class="p">:</span>
             <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span>
                 <span class="p">[</span>
@@ -415,7 +462,7 @@
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   <jinja2.runtime.BlockReference object at 0x7f63d25f9ac0>
+   <jinja2.runtime.BlockReference object at 0x7fc082878d00>
 <br/>
 <br/>
 <p>
