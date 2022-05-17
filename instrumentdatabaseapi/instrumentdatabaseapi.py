@@ -64,7 +64,7 @@ class Repository:
         self.__url = url
 
         sys.path.remove(self.__local_repo)
-        self.__local_repo = local_repo
+        self.__local_repo = os.path.abspath(local_repo)
         sys.path.append(self.__local_repo)
 
         repo = git.Repo.clone_from(self.__url, self.__local_repo, branch=branch)
@@ -90,7 +90,7 @@ class Repository:
         )
 
     def __institutes_absdir(self) -> str:
-        return self.__local_repo + "institutes/"
+        return self.__local_repo + "/institutes/"
 
     def __instruments_absdir(self, institute: str) -> str:
         """Returns the instrument path relative to the institute directory"""
@@ -347,8 +347,7 @@ class Repository:
                     "-m",
                     "pip",
                     "install",
-                    "--target",
-                    self.__local_repo + "python_dependencies/",
+                    "--upgrade",
                     "-r",
                     self.__flavours_absdir(
                         institute, instrument, version, simulation_program

@@ -73,7 +73,7 @@ for par in myinstrument.master:
 for par in myinstrument.master:
     print(par)
 myinstrument.run()
-output = myinstrument.output()
+output = myinstrument.output
 
 if simulation_program == "mcstas":
     last_calc = list(myinstrument.calculators.values())[-1]
@@ -92,5 +92,5 @@ if simulation_program == "mcstas":
     assert np.array_equal(detector.Error, I_val.Error)
     assert np.array_equal(detector.Ncount, I_val.Ncount)
 
-    print(I_val)
+    print(I_val, detector)
 # instrument.backengine()
