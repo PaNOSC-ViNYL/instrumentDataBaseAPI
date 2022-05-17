@@ -20,9 +20,12 @@ my_configurator.set_mcrun_path(MCSTAS_PATH + "/bin/")
 print("McStas path: ", MCSTAS_PATH)
 
 
+simulation_program = ""
+flavour = ""
+version = "HEAD"
+
 if len(sys.argv) < 5:
     raise RuntimeError("Wrong number of command line inputs.")
-# ,"institute instrument version simulation_program flavour are needed")
 
 institute = sys.argv[1]
 instrument = sys.argv[2]
@@ -61,6 +64,8 @@ for calc in myinstrument.calculators:
 # print(f"instrument_base_dir: {instrument.calculators['D22_quick'].instrument_base_dir}")
 # print(f"base_dir: {instrument.calculators['D22_quick'].base_dir}")
 
+print()
+print("Master parameters:")
 print(myinstrument.master)
 for par in myinstrument.master:
     print(par)
