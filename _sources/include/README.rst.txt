@@ -34,6 +34,22 @@ Write here the convension.
 * Documentation: https://panosc-vinyl.github.io/instrumentDataBaseAPI/
 
 
+Running instrument validation
+-----------------------------
+In order to verify that the simulation from an instrument is unchanged with respect to the master branch and the past, quick simulations should be run with a fixed seed for the random number generators and the output compared with what has been obtained and committed in the database repository.
+The validation files to compare to can be found in a subdirectory ``validation`` containing the instrument definition.
+
+Example
+~~~~~~~
+.. code-block: sh
+   ./scripts/test_instrument.py ILL D22 HEAD mcstas quick
+
+where the usage is the following:
+
+.. code-block: none
+   ./scripts/test_instrument.py <institute> <instrument> <version> <simulation_program> <flavour>
+   
+
 Features
 --------
 
