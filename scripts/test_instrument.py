@@ -31,7 +31,9 @@ institute = sys.argv[1]
 instrument = sys.argv[2]
 version = sys.argv[3]
 simulation_program = sys.argv[4]
-flavour = sys.argv[5]
+if len(sys.argv) > 5:
+    flavour = sys.argv[5]
+
 
 # init the local repo, making a git clone
 repo = API.Repository(local_repo=".")

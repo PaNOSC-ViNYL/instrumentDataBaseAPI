@@ -216,7 +216,7 @@ class Repository:
                 )  # removed the instrument string and the .py at the end
 
         if len(flavours) == 0:
-            return [""]
+            flavours.append("")
 
         return flavours
 
@@ -232,7 +232,10 @@ class Repository:
         flavours = self.get_flavours(institute, instrument, version, simulation_program)
         print(f"Available flavours for instrument {instrument}:")
         for d in flavours:
-            print(" - ", d)
+            if d != "":
+                print(" - ", d)
+            else:
+                print("No special flavours available")
 
     def validation_dir(
         self,
@@ -326,7 +329,15 @@ class Repository:
                 + ".py"
             ):
                 # need to retrieve one flavour
-                flavours
+                print(
+                    self.__flavours_absdir(
+                        institute, instrument, version, simulation_program
+                    )
+                    + instrument
+                    + ".py"
+                )
+
+                raise RuntimeError("No instrument files found with no flavour")
 
         modulepath = os.path.relpath(
             self.__flavours_absdir(institute, instrument, version, simulation_program),
