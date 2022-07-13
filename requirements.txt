@@ -1,3 +1,4 @@
 wheel
 gitpython>=3.1.18
 libpyvinyl
+importlib>=1.0.4

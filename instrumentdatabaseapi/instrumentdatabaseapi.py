@@ -366,7 +366,6 @@ class Repository:
                     + "/requirements.txt",
                 ]
             )
-
         myinstrumentmodule = importlib.import_module(mymodule)
 
         if not hasattr(myinstrumentmodule, "def_instrument") or not callable(
