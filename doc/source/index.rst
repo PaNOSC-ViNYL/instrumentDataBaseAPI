@@ -10,8 +10,9 @@ Welcome to instrument database API's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   Introduction <include/README.md>
-   Example <include/notebooks/example-01>
+   Introduction <include/README>
+   Install <include/install>
+   Quickstart <include/quick>
    Reference Manual <include/refman>
 
 

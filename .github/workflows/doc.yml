@@ -1,13 +1,9 @@
-name: build documentation with Sphinx and put it in the docs/ directory for github pages
+name: build documentation with Sphinx and put it in the gh-pages branch
 
 on:
-  pull_request:
-    branches:
-      - main
-      - design
   push:
     branches:
-      - design
+      - main
    
 jobs:
   doc:
