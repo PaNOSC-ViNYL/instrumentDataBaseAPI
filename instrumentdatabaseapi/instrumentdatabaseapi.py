@@ -205,20 +205,10 @@ class Repository:
     def get_flavours(
         self, institute: str, instrument: str, version: str, simulation_program: str
     ) -> List[str]:
-        basedir = self.__flavours_absdir(
-            institute, instrument, version, simulation_program
-        )
-        flavours = []
-        for d in os.listdir(basedir):
-            if re.match(instrument + ".*\.py", d):
-                flavours.append(
-                    d[len(instrument) : -3]
-                )  # removed the instrument string and the .py at the end
+        mymodule = self._get_module(institute, instrument, version, simulation_program)
+        myinstrumentmodule = importlib.import_module(mymodule)
 
-        if len(flavours) == 0:
-            flavours.append("")
-
-        return flavours
+        return myinstrumentmodule.get_flavours()
 
     def ls_flavours(
         self, institute: str, instrument: str, version: str, simulation_program: str
@@ -231,11 +221,12 @@ class Repository:
 
         flavours = self.get_flavours(institute, instrument, version, simulation_program)
         print(f"Available flavours for instrument {instrument}:")
-        for d in flavours:
-            if d != "":
-                print(" - ", d)
-            else:
-                print("No special flavours available")
+        if len(flavours) == 0:
+            print("No special flavours available")
+        else:
+            for d in flavours:
+                if d != "":
+                    print(" - ", d)
 
     def validation_dir(
         self,
@@ -284,15 +275,13 @@ class Repository:
             self.__flavours_absdir(institute, instrument, version, simulation_program)
         ) + "/validation"
 
-    def load(
+    def _get_module(
         self,
         institute: str,
         instrument: str,
         version: str = "HEAD",
         simulation_program: str = "",
-        flavour: str = "",
-        dep: bool = True,
-    ) -> Instrument:
+    ):
         """
         Load an intrument from the repository
 
@@ -319,25 +308,22 @@ class Repository:
                 )
             simulation_program = simulation_programs[0]
 
-        if flavour == "":
-            # double check that an instrument without any flavour exists
-            if not os.path.isfile(
+        # double check that an instrument without any flavour exists
+        if not os.path.isfile(
+            self.__flavours_absdir(institute, instrument, version, simulation_program)
+            + instrument
+            + ".py"
+        ):
+            # need to retrieve one flavour
+            print(
                 self.__flavours_absdir(
                     institute, instrument, version, simulation_program
                 )
                 + instrument
                 + ".py"
-            ):
-                # need to retrieve one flavour
-                print(
-                    self.__flavours_absdir(
-                        institute, instrument, version, simulation_program
-                    )
-                    + instrument
-                    + ".py"
-                )
+            )
 
-                raise RuntimeError("No instrument files found with no flavour")
+            raise RuntimeError("No instrument files found with no flavour")
 
         modulepath = os.path.relpath(
             self.__flavours_absdir(institute, instrument, version, simulation_program),
@@ -348,8 +334,32 @@ class Repository:
         #        )
 
         mymodule = modulepath + "." + instrument
-        if flavour != "":
-            mymodule += "_" + flavour
+        return mymodule
+
+    def load(
+        self,
+        institute: str,
+        instrument: str,
+        version: str = "HEAD",
+        simulation_program: str = "",
+        flavour: str = "",
+        dep: bool = True,
+    ) -> Instrument:
+        """
+        Load an intrument from the repository
+
+        :param simulation_program: name of the simulation program
+        :param institute: name of the institute
+        :param instrument: name of the instrument
+        :param version: version name
+        :param flavour: optional string that might identify two alternative implementations of the same instrument with the same version
+        :param dep: download python dependencies in requirements.txt for the instrument if dep == True
+
+        :return: the instrument object
+        :raise: NotImplementedError if the instrument module does not provide a def_instrument method
+        """
+
+        mymodule = self._get_module(institute, instrument, version, simulation_program)
 
         if dep:
             subprocess.check_call(
@@ -375,7 +385,7 @@ class Repository:
                 "Instrument description script does not implement a def_instrument() method"
             )
 
-        instrument_obj = myinstrumentmodule.def_instrument()
+        instrument_obj = myinstrumentmodule.def_instrument(flavour)
         return instrument_obj
 
 
