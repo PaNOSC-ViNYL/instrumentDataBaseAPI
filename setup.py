@@ -24,17 +24,20 @@ test_requirements = [
 
 
 def get_from_init(rel_path,field):
-    for line in read(rel_path).splitlines():
+    with open(rel_path) as f:
+        line = f.readline()
         if line.startswith(field):
+            print(line)
             delim = '"' if '"' in line else "'"
+            #delim = '='
             return line.split(delim)[1]
-    else:
-        raise RuntimeError("Unable to find "+field+" string.")
+
+    #raise RuntimeError("Unable to find "+field+" string.")
 
 initfile="instrumentdatabaseapi/__init__.py"
 
 setup(
-    author=get_from_init(initfile,"__author__")
+    author=get_from_init(initfile,"__author__"),
     author_email=get_from_init(initfile,"__email__"),
     python_requires=">=3.6",
     classifiers=[
