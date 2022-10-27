@@ -343,7 +343,7 @@ class Repository:
         version: str = "HEAD",
         simulation_program: str = "",
         flavour: str = "",
-        dep: bool = True,
+        dep: bool = False,
     ) -> Instrument:
         """
         Load an intrument from the repository
