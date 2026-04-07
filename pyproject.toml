@@ -3,6 +3,12 @@ name = "instrumentDataBaseAPI"
 version = "0.1.0"
 description = "The API to retrieve an instrumentation"
 readme = "README.rst"
+requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [ {name = "Shervin Nourbakhsh", email = "nourbakhsh@ill.fr"} ]
+keywords = ["example","packaging"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+]
 dependencies = ["gitpython>=3.1.46,<4"]
