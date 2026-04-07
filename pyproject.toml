@@ -1,0 +1,8 @@
+[project]
+name = "instrumentDataBaseAPI"
+version = "0.1.0"
+description = "The API to retrieve an instrumentation"
+readme = "README.rst"
+license = { text = "MIT" }
+authors = [ {name = "Shervin Nourbakhsh", email = "nourbakhsh@ill.fr"} ]
+dependencies = ["gitpython>=3.1.46,<4"]
