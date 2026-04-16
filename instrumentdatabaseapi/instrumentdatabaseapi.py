@@ -1,5 +1,5 @@
-""" 
-This is the main API for getting instrument descriptions from the instrument database 
+"""
+This is the main API for getting instrument descriptions from the instrument database
 """
 
 from abc import ABCMeta, abstractmethod
@@ -52,7 +52,7 @@ class Repository:
         self,
         url: str = "https://github.com/PaNOSC-ViNYL/instrument_database.git",
         local_repo: str = "/tmp/instrumentDBAPI/",
-        branch: str = "shervin",
+        branch: str = "pixi",
     ) -> None:
         """
         Initiate the repository from an URL or local repo
@@ -86,7 +86,7 @@ class Repository:
         return (
             os.path.isdir(abs_dir)
             and basename != "__pycache__"
-            and re.match("\..*", basename) == None
+            #and re.match("\..*", basename) == None
         )
 
     def __institutes_absdir(self) -> str:
